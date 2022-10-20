@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/XiovV/centralog-agent/pkg/docker"
 	"github.com/XiovV/centralog-agent/server"
 	"github.com/fvbock/endless"
@@ -14,6 +15,16 @@ var (
 	appEnv = os.Getenv("APP_ENV")
 )
 
+func generateMessages(size int) []string {
+	messages := []string{}
+
+	for i := 1; i <= size; i++ {
+		messages = append(messages, fmt.Sprintf("message%d", i))
+	}
+
+	return messages
+}
+
 func main() {
 	logger, err := initLogger()
 	if err != nil {
@@ -23,7 +34,7 @@ func main() {
 	defer logger.Sync()
 
 	dockerController := docker.New()
-	
+
 	srv := server.Server{
 		Logger: logger,
 		Docker: dockerController,
