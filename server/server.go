@@ -1,10 +1,9 @@
 package server
 
 import (
-	"fmt"
 	"github.com/XiovV/centralog-agent/pkg/docker"
+	"github.com/XiovV/centralog-agent/repository"
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -16,23 +15,15 @@ const (
 )
 
 type Server struct {
-	Logger *zap.Logger
-	Docker *docker.Controller
-}
-
-type Logs struct {
-}
-
-func (l Logs) Write(p []byte) (int, error) {
-	fmt.Println(p)
-
-	return 0, nil
+	Logger     *zap.Logger
+	Docker     *docker.Controller
+	Repository *repository.Repository
 }
 
 func (s *Server) New() {
-	out := s.Docker.GetLogs("d64552a3f96c", types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	logs := s.Docker.GetLogs("d64552a3f96c", types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 
-	stdcopy.StdCopy(docker.StdOut, docker.StdOut, out)
+	s.Repository.StoreLogs(logs)
 }
 
 func (s *Server) Serve() *gin.Engine {

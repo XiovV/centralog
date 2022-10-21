@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/XiovV/centralog-agent/pkg/docker"
+	"github.com/XiovV/centralog-agent/repository"
 	"github.com/XiovV/centralog-agent/server"
 	"github.com/fvbock/endless"
 	"go.uber.org/zap"
@@ -34,10 +35,12 @@ func main() {
 	defer logger.Sync()
 
 	dockerController := docker.New()
+	repo := repository.New()
 
 	srv := server.Server{
-		Logger: logger,
-		Docker: dockerController,
+		Logger:     logger,
+		Docker:     dockerController,
+		Repository: repo,
 	}
 
 	logger.Info("running...", zap.String("port", os.Getenv("PORT")))
