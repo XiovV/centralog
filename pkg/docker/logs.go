@@ -1,28 +1,32 @@
 package docker
 
 import (
-	"github.com/XiovV/centralog-agent/repository"
+	"fmt"
 )
 
+type Log struct {
+	ContainerID string
+	Message     string
+}
+
+func (l *Log) String() string {
+	return fmt.Sprintf("container: %s message: %s", l.ContainerID, l.Message)
+}
+
 type LogWriter struct {
-	buf []repository.LogMessage
+	buf         *LogBuffer
+	containerId string
 }
 
 func (l *LogWriter) Write(p []byte) (int, error) {
 	str := string(p)
-	l.addLog(str)
+	l.buf.WriteLog(l.containerId, str)
+
+	fmt.Printf("container: %s message: %s", l.containerId, str)
 
 	return len(p), nil
 }
 
-func (l *LogWriter) addLog(message string) {
-	l.buf = append(l.buf, repository.LogMessage{"message": message})
-}
-
-func (l *LogWriter) GetLogs() []repository.LogMessage {
-	return l.buf
-}
-
-func NewLogWriter() *LogWriter {
-	return &LogWriter{buf: []repository.LogMessage{}}
+func NewLogWriter(buf *LogBuffer, containerId string) *LogWriter {
+	return &LogWriter{buf: buf, containerId: containerId}
 }

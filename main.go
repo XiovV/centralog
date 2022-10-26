@@ -34,8 +34,8 @@ func main() {
 
 	defer logger.Sync()
 
-	dockerController := docker.New()
 	repo := repository.New()
+	dockerController := docker.New(repo)
 
 	srv := server.Server{
 		Logger:     logger,

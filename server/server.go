@@ -21,9 +21,13 @@ type Server struct {
 }
 
 func (s *Server) New() {
-	logs := s.Docker.GetLogs("d64552a3f96c", types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	containers := []string{"c97d397c06e7", "a20f44c27e6e"}
 
-	s.Repository.StoreLogs(logs)
+	for _, container := range containers {
+		go s.Docker.CollectLogs(container, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
+	}
+
+	//s.Repository.StoreLogs(logs)
 }
 
 func (s *Server) Serve() *gin.Engine {

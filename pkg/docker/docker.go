@@ -11,28 +11,27 @@ import (
 type Controller struct {
 	ctx       context.Context
 	cli       *client.Client
-	logWriter *LogWriter
+	logBuffer *LogBuffer
 }
 
-func New() *Controller {
+func New(db *repository.Repository) *Controller {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		panic(err)
 	}
 
-	logWriter := NewLogWriter()
-
 	return &Controller{
 		ctx:       ctx,
 		cli:       cli,
-		logWriter: logWriter,
+		logBuffer: NewLogBuffer(db),
 	}
 }
 
-func (c *Controller) GetLogs(container string, options types.ContainerLogsOptions) []repository.LogMessage {
-	out, _ := c.cli.ContainerLogs(c.ctx, "d64552a3f96cb6342c06aa055c5579046b6da94f362ef2360ad5aefadc3d05b1", options)
+func (c *Controller) CollectLogs(container string, options types.ContainerLogsOptions) {
+	logWriter := NewLogWriter(c.logBuffer, container)
 
-	stdcopy.StdCopy(c.logWriter, c.logWriter, out)
-	return c.logWriter.GetLogs()
+	out, _ := c.cli.ContainerLogs(c.ctx, container, options)
+
+	stdcopy.StdCopy(logWriter, logWriter, out)
 }
