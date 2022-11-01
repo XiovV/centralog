@@ -2,15 +2,13 @@ package docker
 
 import (
 	"fmt"
+	"strings"
+	"time"
 )
 
 type Log struct {
 	ContainerID string
 	Message     string
-}
-
-func (l *Log) String() string {
-	return fmt.Sprintf("container: %s message: %s", l.ContainerID, l.Message)
 }
 
 type LogWriter struct {
@@ -20,9 +18,18 @@ type LogWriter struct {
 
 func (l *LogWriter) Write(p []byte) (int, error) {
 	str := string(p)
-	l.buf.WriteLog(l.containerId, str)
 
-	fmt.Printf("container: %s message: %s", l.containerId, str)
+	strParts := strings.SplitN(str, " ", 2)
+
+	log := strParts[1]
+	timestamp, err := time.Parse("2006-01-02T15:04:05Z", strParts[0])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	l.buf.WriteLog(l.containerId, log, timestamp.UnixMilli())
+
+	fmt.Printf("container: %s message: %s", l.containerId, log)
 
 	return len(p), nil
 }

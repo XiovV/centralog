@@ -21,13 +21,11 @@ type Server struct {
 }
 
 func (s *Server) New() {
-	containers := []string{"c97d397c06e7", "a20f44c27e6e"}
+	containers := []string{"logserver1", "logserver2"}
 
 	for _, container := range containers {
-		go s.Docker.CollectLogs(container, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
+		go s.Docker.CollectLogs(container, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
 	}
-
-	//s.Repository.StoreLogs(logs)
 }
 
 func (s *Server) Serve() *gin.Engine {
