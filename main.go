@@ -5,6 +5,7 @@ import (
 	"github.com/XiovV/centralog-agent/pkg/docker"
 	"github.com/XiovV/centralog-agent/repository"
 	"github.com/XiovV/centralog-agent/server"
+	"github.com/docker/docker/api/types"
 	"github.com/fvbock/endless"
 	"go.uber.org/zap"
 	"log"
@@ -36,6 +37,12 @@ func main() {
 
 	repo := repository.New()
 	dockerController := docker.New(repo)
+
+	containers := []string{"logserver1", "logserver2"}
+
+	for _, container := range containers {
+		go dockerController.CollectLogs(container, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
+	}
 
 	srv := server.Server{
 		Logger:     logger,

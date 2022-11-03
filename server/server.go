@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/XiovV/centralog-agent/pkg/docker"
 	"github.com/XiovV/centralog-agent/repository"
-	"github.com/docker/docker/api/types"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -20,16 +19,7 @@ type Server struct {
 	Repository *repository.Repository
 }
 
-func (s *Server) New() {
-	containers := []string{"logserver1", "logserver2"}
-
-	for _, container := range containers {
-		go s.Docker.CollectLogs(container, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
-	}
-}
-
 func (s *Server) Serve() *gin.Engine {
-	s.New()
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
