@@ -60,12 +60,12 @@ func (a *App) ListContainersCmd(node string) {
 	w.Flush()
 }
 
-func (a *App) ShowLogs() {
+func (a *App) ShowLogs(containers []string) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	request := &pb.FollowLogsRequest{
-		Containers: []string{"logserver1", "logserver2"},
+		Containers: containers,
 		ShowAll:    false,
 	}
 

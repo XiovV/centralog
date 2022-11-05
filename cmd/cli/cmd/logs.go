@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	json bool
+	json       bool
+	containers []string
 )
 
 // logsCmd represents the logs command
@@ -19,12 +20,13 @@ var logsCmd = &cobra.Command{
 	Short: "shows logs",
 	Run: func(cmd *cobra.Command, args []string) {
 		app := centralog.NewApp()
-		app.ShowLogs()
+		app.ShowLogs(containers)
 	},
 }
 
 func init() {
 	logsCmd.Flags().BoolVarP(&json, "json", "j", false, "json output")
+	logsCmd.Flags().StringSliceVarP(&containers, "containers", "c", []string{}, "exampleContainer1,exampleContainer2,exampleContainer3")
 
 	rootCmd.AddCommand(logsCmd)
 }
