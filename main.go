@@ -6,7 +6,6 @@ import (
 	"github.com/XiovV/centralog-agent/repository"
 	"github.com/XiovV/centralog-agent/server"
 	"github.com/docker/docker/api/types"
-	"github.com/fvbock/endless"
 	"go.uber.org/zap"
 	"log"
 	"math/rand"
@@ -40,8 +39,12 @@ func main() {
 
 	containers := []string{"logserver1", "logserver2"}
 
+	logBuffer := docker.NewLogBuffer(repo)
+
 	for _, container := range containers {
-		go dockerController.CollectLogs(container, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
+		logWriter := docker.NewBackgroundLogWriter(logBuffer, container)
+
+		go dockerController.CollectLogs(container, logWriter, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
 	}
 
 	srv := server.Server{
@@ -52,7 +55,7 @@ func main() {
 
 	logger.Info("running...", zap.String("port", os.Getenv("PORT")))
 
-	endless.ListenAndServe(":"+os.Getenv("PORT"), srv.Serve())
+	srv.Serve()
 }
 
 func generateApiKey() string {

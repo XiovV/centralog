@@ -6,6 +6,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
+	"io"
 )
 
 type Controller struct {
@@ -28,20 +29,18 @@ func New(db *repository.Repository) *Controller {
 	}
 }
 
-func (c *Controller) CollectLogs(container string, options types.ContainerLogsOptions) {
-	logWriter := NewLogWriter(c.logBuffer, container)
-
+func (c *Controller) CollectLogs(container string, writer io.Writer, options types.ContainerLogsOptions) {
 	containerId := c.FindContainerIDByName(container)
 
 	out, _ := c.cli.ContainerLogs(c.ctx, containerId, options)
 
-	stdcopy.StdCopy(logWriter, logWriter, out)
+	stdcopy.StdCopy(writer, writer, out)
 }
 
 func (c *Controller) FindContainerIDByName(name string) string {
 	containers, _ := c.cli.ContainerList(c.ctx, types.ContainerListOptions{All: true})
 
-	// [1:] is used because the container name contains a slash at the beginning.
+	// [1:] is used because the containerId name contains a slash at the beginning.
 	for _, container := range containers {
 		if container.Names[0][1:] == name {
 			return container.ID

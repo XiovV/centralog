@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/XiovV/centralog-agent";
+
+service Logs {
+  rpc FollowLogs(FollowLogsRequest) returns (stream Log) {}
+}
+
+message Log {
+  string container = 1;
+  int64 timestamp = 2;
+  string message = 3;
+}
+
+message FollowLogsRequest {
+  repeated string containers = 1;
+  bool showAll = 2;
+}

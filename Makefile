@@ -18,3 +18,7 @@ stop:
 start:
 	@echo 'Starting logservers...'
 	docker start logserver1 logserver2
+
+.PHONY: protoc
+protoc:
+	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative grpc/centralog.proto
