@@ -88,15 +88,10 @@ func (a *App) ShowLogs(containers []string) {
 }
 
 func (a *App) AddNodeWithPrompt() {
-	prompt.GetURL("Enter your node's URL")
-	_, err := prompt.GetAPIKey("Enter your node's API key")
-	if err != nil {
-		fmt.Println(err)
-	}
+	node, containers := prompt.AddNode()
 
-	name := prompt.GetString("Enter your node's custom name")
-
-	fmt.Printf("Node %s added successfully\n", name)
+	fmt.Printf("Node %s added successfully\n", node.Name)
+	fmt.Println("You selected:", containers)
 }
 
 func (a *App) AddNodeWithFlags(url, apiKey, name string) {

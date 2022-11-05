@@ -1,47 +1,103 @@
 package prompt
 
 import (
-	"errors"
-	"github.com/manifoldco/promptui"
+	"github.com/AlecAivazis/survey/v2"
+	"log"
 )
 
-func GetURL(label string) string {
-	//TODO: add url validation here
-	prompt := promptui.Prompt{
-		Label: label,
-	}
-
-	result, _ := prompt.Run()
-	return result
+type Node struct {
+	URL  string
+	Key  string
+	Name string
 }
 
-func GetAPIKey(label string) (string, error) {
-	validate := func(input string) error {
-		if len(input) != 5 {
-			return errors.New("api key must be exactly 5 characters long")
-		}
-
-		return nil
+func AddNode() (Node, []string) {
+	qs := []*survey.Question{
+		{
+			Name:     "url",
+			Prompt:   &survey.Input{Message: "Enter your node's URL:"},
+			Validate: survey.Required,
+		},
+		{
+			Name:     "key",
+			Prompt:   &survey.Input{Message: "Enter your node's API key:"},
+			Validate: survey.Required,
+		},
+		{
+			Name:     "name",
+			Prompt:   &survey.Input{Message: "Enter your node's custom name:"},
+			Validate: survey.Required,
+		},
 	}
 
-	prompt := promptui.Prompt{
-		Label:    label,
-		Validate: validate,
-	}
-
-	result, err := prompt.Run()
+	var answers Node
+	err := survey.Ask(qs, &answers)
 	if err != nil {
-		return "", err
+		log.Fatalln(err)
 	}
 
-	return result, nil
-}
+	containers := []string{}
 
-func GetString(label string) string {
-	prompt := promptui.Prompt{
-		Label: label,
+	prompt := &survey.MultiSelect{
+		Message: "Select containers:",
+		Options: []string{"logserver1", "logserver2"},
 	}
 
-	result, _ := prompt.Run()
-	return result
+	survey.AskOne(prompt, &containers)
+
+	return answers, containers
 }
+
+//func GetURL(label string) string {
+//	//TODO: add url validation here
+//	prompt := promptui.Prompt{
+//		Label: label,
+//	}
+//
+//	result, _ := prompt.Run()
+//	return result
+//}
+//
+//func GetAPIKey(label string) (string, error) {
+//	validate := func(input string) error {
+//		if len(input) != 5 {
+//			return errors.New("api key must be exactly 5 characters long")
+//		}
+//
+//		return nil
+//	}
+//
+//	prompt := promptui.Prompt{
+//		Label:    label,
+//		Validate: validate,
+//	}
+//
+//	result, err := prompt.Run()
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	return result, nil
+//}
+//
+//func GetString(label string) string {
+//	prompt := promptui.Prompt{
+//		Label: label,
+//	}
+//
+//	result, _ := prompt.Run()
+//	return result
+//}
+//
+//func ShowSelect() {
+//	prompt := promptui.Select{
+//		Label: "Select Containers",
+//		Items: []string{"container1", "container2", "container3"},
+//	}
+//
+//	_, result, err := prompt.Run()
+//	if err != nil {
+//		return err
+//	}
+//
+//}
