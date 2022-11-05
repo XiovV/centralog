@@ -2,8 +2,8 @@ package server
 
 import (
 	"fmt"
+	docker2 "github.com/XiovV/centralog-agent/docker"
 	pb "github.com/XiovV/centralog-agent/grpc"
-	"github.com/XiovV/centralog-agent/pkg/docker"
 	"github.com/XiovV/centralog-agent/repository"
 	"github.com/docker/docker/api/types"
 	"go.uber.org/zap"
@@ -26,7 +26,7 @@ type Server struct {
 	pb.UnimplementedLogsServer
 
 	Logger     *zap.Logger
-	Docker     *docker.Controller
+	Docker     *docker2.Controller
 	Repository *repository.Repository
 }
 
@@ -54,7 +54,7 @@ func (s *Server) FollowLogs(request *pb.FollowLogsRequest, stream pb.Logs_Follow
 	}
 
 	for _, container := range request.Containers {
-		logWriter := docker.NewServerLogWriter(container, stream)
+		logWriter := docker2.NewServerLogWriter(container, stream)
 
 		go s.Docker.CollectLogs(container, logWriter, options)
 	}
