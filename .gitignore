@@ -2,4 +2,4 @@ centralog-agent
 db
 .idea
 cmd/agent/agent
-cmd/cli/centralog-cli
+cmd/cli/cli
