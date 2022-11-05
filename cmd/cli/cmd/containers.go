@@ -4,7 +4,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/XiovV/centralog-cli/centralog"
+	"github.com/XiovV/centralog-agent/cmd/cli/centralog"
 
 	"github.com/spf13/cobra"
 )

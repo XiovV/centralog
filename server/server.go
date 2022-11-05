@@ -43,6 +43,8 @@ func (s *Server) Serve() error {
 }
 
 func (s *Server) FollowLogs(request *pb.FollowLogsRequest, stream pb.Logs_FollowLogsServer) error {
+	fmt.Println("RECEIVED FOLLOW LOGS")
+
 	if len(request.Containers) == 0 {
 		return status.Error(codes.InvalidArgument, "containers array empty")
 	}

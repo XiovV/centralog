@@ -1,14 +1,31 @@
 package centralog
 
 import (
-	"bufio"
+	"context"
 	"fmt"
-	"github.com/XiovV/centralog-cli/pkg/prompt"
+	"github.com/XiovV/centralog-agent/cmd/cli/pkg/prompt"
+	pb "github.com/XiovV/centralog-agent/grpc"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"io"
+	"log"
 	"os"
 	"text/tabwriter"
 )
 
 type App struct {
+	client pb.LogsClient
+}
+
+func NewApp() *App {
+	conn, err := grpc.Dial("localhost:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	client := pb.NewLogsClient(conn)
+
+	return &App{client: client}
 }
 
 func (a *App) ListNodesCmd() {
@@ -44,30 +61,30 @@ func (a *App) ListContainersCmd(node string) {
 }
 
 func (a *App) ShowLogs() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	w := bufio.NewWriterSize(os.Stdout, 2)
+	request := &pb.FollowLogsRequest{
+		Containers: []string{"logserver1", "logserver2"},
+		ShowAll:    false,
+	}
 
-	w.WriteString("s1")
-	w.WriteString("s2")
-	w.WriteString("s3")
-	w.WriteString("s4")
-	w.WriteString("s5")
-	w.WriteString("s6")
-	w.WriteString("s")
+	stream, err := a.client.FollowLogs(ctx, request)
+	if err != nil {
+		log.Fatalf("error initialising stream: %v", err)
+	}
 
-	fmt.Println("")
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("error while receiving stream: %v", err)
+		}
 
-	w.Flush()
-
-	//
-	//fmt.Fprintln(w, "testsdfsdfsdfsdfsdfdsf")
-	//fmt.Fprintln(w, "testsdfsdfsdfsdfsdfdsf")
-	//fmt.Fprintln(w, "testsdfsdfsdfsdfsdfdsf")
-	//fmt.Fprintln(w, "testsdfsdfsdfsdfsdfdsf")
-
-	//w.Flush()
-
-	//fmt.Printf("node=%s container=%s message: %s\n", "node1")
+		fmt.Printf("container: %s | timestamp: %d | message: %s", resp.Container, resp.Timestamp, resp.Message)
+	}
 }
 
 func (a *App) AddNodeWithPrompt() {
