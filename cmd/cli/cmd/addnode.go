@@ -17,7 +17,7 @@ var addNodeCmd = &cobra.Command{
 	Use:   "node",
 	Short: "used to add a node",
 	Run: func(cmd *cobra.Command, args []string) {
-		app := centralog.App{}
+		app := centralog.NewApp()
 
 		if url == "" && apiKey == "" && name == "" {
 			app.AddNodeWithPrompt()

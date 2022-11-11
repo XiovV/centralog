@@ -10,10 +10,10 @@ const (
 
 type LogBuffer struct {
 	buf []repository.LogMessage
-	db  *repository.Repository
+	db  *repository.SQLite
 }
 
-func NewLogBuffer(db *repository.Repository) *LogBuffer {
+func NewLogBuffer(db *repository.SQLite) *LogBuffer {
 	return &LogBuffer{buf: []repository.LogMessage{}, db: db}
 }
 

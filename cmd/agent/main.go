@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"github.com/XiovV/centralog-agent/docker"
 	"github.com/XiovV/centralog-agent/repository"
-	"github.com/XiovV/centralog-agent/server"
-	"github.com/docker/docker/api/types"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"
 	"os"
@@ -15,16 +14,6 @@ import (
 var (
 	appEnv = os.Getenv("APP_ENV")
 )
-
-func generateMessages(size int) []string {
-	messages := []string{}
-
-	for i := 1; i <= size; i++ {
-		messages = append(messages, fmt.Sprintf("message%d", i))
-	}
-
-	return messages
-}
 
 func main() {
 	logger, err := initLogger()
@@ -37,17 +26,19 @@ func main() {
 	repo := repository.New()
 	dockerController := docker.New(repo)
 
-	containers := []string{"logserver1", "logserver2"}
+	checkAPIKey(repo)
 
-	logBuffer := docker.NewLogBuffer(repo)
+	//containers := []string{"logserver1", "logserver2"}
+	//
+	//logBuffer := docker.NewLogBuffer(repo)
+	//
+	//for _, container := range containers {
+	//	logWriter := docker.NewBackgroundLogWriter(logBuffer, container)
+	//
+	//	go dockerController.CollectLogs(container, logWriter, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
+	//}
 
-	for _, container := range containers {
-		logWriter := docker.NewBackgroundLogWriter(logBuffer, container)
-
-		go dockerController.CollectLogs(container, logWriter, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
-	}
-
-	srv := server.Server{
+	srv := Server{
 		Logger:     logger,
 		Docker:     dockerController,
 		Repository: repo,
@@ -58,21 +49,34 @@ func main() {
 	srv.Serve()
 }
 
-func generateApiKey() string {
-	apiKeyLength := 39
+func checkAPIKey(r *repository.SQLite) {
+	key := r.GetAPIKey()
+	if len(key) == 0 {
+		newKey, keyStr := generateHashedAPIKey()
 
+		r.StoreAPIKey(newKey)
+
+		fmt.Println("Your new API key is:", keyStr)
+	}
+}
+
+func generateHashedAPIKey() ([]byte, string) {
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
-	s := make([]rune, apiKeyLength)
+	s := make([]rune, KEY_LENGTH)
 	for i := range s {
 		s[i] = letters[rand.Intn(len(letters))]
 	}
 
-	return string(s)
+	keyStr := string(s)
+
+	hashedKey, _ := bcrypt.GenerateFromPassword([]byte(keyStr), bcrypt.DefaultCost)
+
+	return hashedKey, keyStr
 }
 
 func initLogger() (*zap.Logger, error) {
-	if appEnv == server.LOCAL_ENV || appEnv == server.STAGING_ENV {
+	if appEnv == LOCAL_ENV || appEnv == STAGING_ENV {
 		logger, err := zap.NewDevelopment()
 
 		if err != nil {

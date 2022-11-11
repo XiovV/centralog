@@ -48,7 +48,7 @@ func NewBackgroundLogWriter(buf *LogBuffer, containerId string) *BackgroundLogWr
 
 type ServerLogWriter struct {
 	containerId string
-	stream      pb.Logs_FollowLogsServer
+	stream      pb.Centralog_FollowLogsServer
 }
 
 func (l *ServerLogWriter) Write(p []byte) (int, error) {
@@ -65,6 +65,6 @@ func (l *ServerLogWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-func NewServerLogWriter(container string, stream pb.Logs_FollowLogsServer) *ServerLogWriter {
+func NewServerLogWriter(container string, stream pb.Centralog_FollowLogsServer) *ServerLogWriter {
 	return &ServerLogWriter{containerId: container, stream: stream}
 }

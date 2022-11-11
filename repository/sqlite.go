@@ -7,18 +7,18 @@ import (
 )
 
 const (
-	dbFileName = "db"
+	dbFileName = "db.db"
 )
 
-type Repository struct {
+type SQLite struct {
 	db *sqlx.DB
 }
 
-func New() *Repository {
+func New() *SQLite {
 	db, err := sqlx.Connect("sqlite3", dbFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &Repository{db: db}
+	return &SQLite{db: db}
 }

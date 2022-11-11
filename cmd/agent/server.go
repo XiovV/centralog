@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"context"
@@ -7,7 +7,10 @@ import (
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"github.com/XiovV/centralog-agent/repository"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
 	"os"
@@ -17,6 +20,7 @@ const (
 	LOCAL_ENV      = "LOCAL"
 	STAGING_ENV    = "STAGING"
 	PRODUCTION_ENV = "PROD"
+	KEY_LENGTH     = 41
 )
 
 type Server struct {
@@ -44,16 +48,16 @@ func (s *Server) Health(ctx context.Context, in *pb.HealthCheckRequest) (*pb.Hea
 }
 
 func (s *Server) CheckAPIKey(ctx context.Context, in *pb.CheckAPIKeyRequest) (*pb.CheckAPIKeyResponse, error) {
-	// TODO: hash the api key and compare the hash
+	if len(in.GetKey()) > KEY_LENGTH {
+		return &pb.CheckAPIKeyResponse{Valid: false}, status.Error(codes.InvalidArgument, "api key is too long")
+	}
+
 	key := s.Repository.GetAPIKey()
-	fmt.Println(key)
 
-	return &pb.CheckAPIKeyResponse{Valid: false}, nil
+	err := bcrypt.CompareHashAndPassword(key, []byte(in.GetKey()))
+	if err != nil {
+		return &pb.CheckAPIKeyResponse{Valid: false}, status.Error(codes.InvalidArgument, "api key is invalid")
+	}
 
-	// TODO: return an appropriate error
-	//if key != in.Key {
-	//	return &pb.CheckAPIKeyResponse{Valid: false}, nil
-	//}
-	//
-	//return &pb.CheckAPIKeyResponse{Valid: true}, nil
+	return &pb.CheckAPIKeyResponse{Valid: true}, nil
 }

@@ -2,8 +2,11 @@ syntax = "proto3";
 
 option go_package = "github.com/XiovV/centralog-agent";
 
-service Logs {
+service Centralog {
+  rpc Health(HealthCheckRequest) returns (HealthCheckResponse) {}
+  rpc CheckAPIKey(CheckAPIKeyRequest) returns (CheckAPIKeyResponse) {}
   rpc FollowLogs(FollowLogsRequest) returns (stream Log) {}
+  rpc GetContainers(GetContainersRequest) returns (ContainerResponse) {}
 }
 
 message Log {
@@ -15,4 +18,34 @@ message Log {
 message FollowLogsRequest {
   repeated string containers = 1;
   bool showAll = 2;
+}
+
+message ContainerResponse {
+  repeated Container containers = 1;
+}
+
+message GetContainersRequest {
+
+}
+
+message CheckAPIKeyRequest {
+  string key = 1;
+}
+
+message CheckAPIKeyResponse {
+  bool valid = 1;
+}
+
+message Container {
+  string id = 1;
+  string name = 2;
+  string state = 3;
+}
+
+message HealthCheckRequest {
+
+}
+
+message HealthCheckResponse {
+  uint32 status = 1;
 }

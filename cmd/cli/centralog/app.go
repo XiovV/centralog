@@ -2,19 +2,21 @@ package centralog
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/XiovV/centralog-agent/cmd/cli/pkg/prompt"
+	"github.com/AlecAivazis/survey/v2"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"io"
 	"log"
 	"os"
+	"reflect"
 	"text/tabwriter"
 )
 
 type App struct {
-	client pb.LogsClient
+	centralogClient pb.CentralogClient
 }
 
 func NewApp() *App {
@@ -23,9 +25,11 @@ func NewApp() *App {
 		log.Fatalln(err)
 	}
 
-	client := pb.NewLogsClient(conn)
+	client := pb.NewCentralogClient(conn)
 
-	return &App{client: client}
+	return &App{
+		centralogClient: client,
+	}
 }
 
 func (a *App) ListNodesCmd() {
@@ -69,7 +73,7 @@ func (a *App) ShowLogs(containers []string) {
 		ShowAll:    false,
 	}
 
-	stream, err := a.client.FollowLogs(ctx, request)
+	stream, err := a.centralogClient.FollowLogs(ctx, request)
 	if err != nil {
 		log.Fatalf("error initialising stream: %v", err)
 	}
@@ -87,10 +91,109 @@ func (a *App) ShowLogs(containers []string) {
 	}
 }
 
-func (a *App) AddNodeWithPrompt() {
-	node, containers := prompt.AddNode()
+func (a *App) getContainersRPC(client pb.CentralogClient) []*pb.Container {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	response, _ := client.GetContainers(ctx, &pb.GetContainersRequest{})
 
-	fmt.Printf("Node %s added successfully\n", node.Name)
+	return response.Containers
+}
+
+func (a *App) pingServer(target string) (pb.CentralogClient, error) {
+	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	client := pb.NewCentralogClient(conn)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	_, err = client.Health(ctx, &pb.HealthCheckRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
+func (a *App) checkAPIKey(client pb.CentralogClient, key string) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	_, err := client.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{Key: key})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) AddNodeWithPrompt() {
+	var client pb.CentralogClient
+
+	qs := []*survey.Question{
+		{
+			Name:   "url",
+			Prompt: &survey.Input{Message: "Enter your node's URL:"},
+			Validate: func(ans interface{}) error {
+				val := reflect.ValueOf(ans).String()
+				c, err := a.pingServer(val)
+				if err != nil {
+					return errors.New("connection refused, please check your URL.")
+				}
+
+				client = c
+
+				return nil
+			},
+		},
+		{
+			Name:   "key",
+			Prompt: &survey.Input{Message: "Enter your node's API key:"},
+			Validate: func(ans interface{}) error {
+				val := reflect.ValueOf(ans).String()
+
+				err := a.checkAPIKey(client, val)
+				if err != nil {
+					return errors.New("api key is invalid")
+				}
+
+				return nil
+			},
+		},
+		{
+			Name:     "name",
+			Prompt:   &survey.Input{Message: "Enter your node's custom name:"},
+			Validate: survey.Required,
+		},
+	}
+
+	var answers struct {
+		Url  string
+		Key  string
+		Name string
+	}
+
+	err := survey.Ask(qs, &answers)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	containers := []string{}
+	for _, container := range a.getContainersRPC(client) {
+		containers = append(containers, fmt.Sprintf("%s (%s)", container.Name, container.State))
+	}
+
+	prompt := &survey.MultiSelect{
+		Message: "Select containers:",
+		Options: containers,
+	}
+
+	survey.AskOne(prompt, &containers)
+
+	fmt.Printf("Node %s added successfully\n", answers.Name)
 	fmt.Println("You selected:", containers)
 }
 

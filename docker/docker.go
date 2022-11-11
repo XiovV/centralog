@@ -15,7 +15,7 @@ type Controller struct {
 	logBuffer *LogBuffer
 }
 
-func New(db *repository.Repository) *Controller {
+func New(db *repository.SQLite) *Controller {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {

@@ -138,6 +138,333 @@ func (x *FollowLogsRequest) GetShowAll() bool {
 	return false
 }
 
+type ContainerResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Containers []*Container `protobuf:"bytes,1,rep,name=containers,proto3" json:"containers,omitempty"`
+}
+
+func (x *ContainerResponse) Reset() {
+	*x = ContainerResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpc_centralog_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ContainerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContainerResponse) ProtoMessage() {}
+
+func (x *ContainerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_centralog_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContainerResponse.ProtoReflect.Descriptor instead.
+func (*ContainerResponse) Descriptor() ([]byte, []int) {
+	return file_grpc_centralog_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ContainerResponse) GetContainers() []*Container {
+	if x != nil {
+		return x.Containers
+	}
+	return nil
+}
+
+type GetContainersRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetContainersRequest) Reset() {
+	*x = GetContainersRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpc_centralog_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetContainersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetContainersRequest) ProtoMessage() {}
+
+func (x *GetContainersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_centralog_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetContainersRequest.ProtoReflect.Descriptor instead.
+func (*GetContainersRequest) Descriptor() ([]byte, []int) {
+	return file_grpc_centralog_proto_rawDescGZIP(), []int{3}
+}
+
+type CheckAPIKeyRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (x *CheckAPIKeyRequest) Reset() {
+	*x = CheckAPIKeyRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpc_centralog_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CheckAPIKeyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckAPIKeyRequest) ProtoMessage() {}
+
+func (x *CheckAPIKeyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_centralog_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckAPIKeyRequest.ProtoReflect.Descriptor instead.
+func (*CheckAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return file_grpc_centralog_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CheckAPIKeyRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+type CheckAPIKeyResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Valid bool `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
+}
+
+func (x *CheckAPIKeyResponse) Reset() {
+	*x = CheckAPIKeyResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpc_centralog_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CheckAPIKeyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckAPIKeyResponse) ProtoMessage() {}
+
+func (x *CheckAPIKeyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_centralog_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckAPIKeyResponse.ProtoReflect.Descriptor instead.
+func (*CheckAPIKeyResponse) Descriptor() ([]byte, []int) {
+	return file_grpc_centralog_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CheckAPIKeyResponse) GetValid() bool {
+	if x != nil {
+		return x.Valid
+	}
+	return false
+}
+
+type Container struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name  string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	State string `protobuf:"bytes,3,opt,name=state,proto3" json:"state,omitempty"`
+}
+
+func (x *Container) Reset() {
+	*x = Container{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpc_centralog_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Container) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Container) ProtoMessage() {}
+
+func (x *Container) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_centralog_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Container.ProtoReflect.Descriptor instead.
+func (*Container) Descriptor() ([]byte, []int) {
+	return file_grpc_centralog_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Container) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Container) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Container) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+type HealthCheckRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *HealthCheckRequest) Reset() {
+	*x = HealthCheckRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpc_centralog_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HealthCheckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HealthCheckRequest) ProtoMessage() {}
+
+func (x *HealthCheckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_centralog_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HealthCheckRequest.ProtoReflect.Descriptor instead.
+func (*HealthCheckRequest) Descriptor() ([]byte, []int) {
+	return file_grpc_centralog_proto_rawDescGZIP(), []int{7}
+}
+
+type HealthCheckResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Status uint32 `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *HealthCheckResponse) Reset() {
+	*x = HealthCheckResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpc_centralog_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HealthCheckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HealthCheckResponse) ProtoMessage() {}
+
+func (x *HealthCheckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_centralog_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HealthCheckResponse.ProtoReflect.Descriptor instead.
+func (*HealthCheckResponse) Descriptor() ([]byte, []int) {
+	return file_grpc_centralog_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *HealthCheckResponse) GetStatus() uint32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
 var File_grpc_centralog_proto protoreflect.FileDescriptor
 
 var file_grpc_centralog_proto_rawDesc = []byte{
@@ -153,13 +480,44 @@ var file_grpc_centralog_proto_rawDesc = []byte{
 	0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x6f,
 	0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x68, 0x6f, 0x77,
 	0x41, 0x6c, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x68, 0x6f, 0x77, 0x41,
-	0x6c, 0x6c, 0x32, 0x32, 0x0a, 0x04, 0x4c, 0x6f, 0x67, 0x73, 0x12, 0x2a, 0x0a, 0x0a, 0x46, 0x6f,
-	0x6c, 0x6c, 0x6f, 0x77, 0x4c, 0x6f, 0x67, 0x73, 0x12, 0x12, 0x2e, 0x46, 0x6f, 0x6c, 0x6c, 0x6f,
-	0x77, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x04, 0x2e, 0x4c,
-	0x6f, 0x67, 0x22, 0x00, 0x30, 0x01, 0x42, 0x22, 0x5a, 0x20, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x58, 0x69, 0x6f, 0x76, 0x56, 0x2f, 0x63, 0x65, 0x6e, 0x74, 0x72,
-	0x61, 0x6c, 0x6f, 0x67, 0x2d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x6c, 0x6c, 0x22, 0x3f, 0x0a, 0x11, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x61,
+	0x69, 0x6e, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x43, 0x6f,
+	0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e,
+	0x65, 0x72, 0x73, 0x22, 0x16, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69,
+	0x6e, 0x65, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x26, 0x0a, 0x12, 0x43,
+	0x68, 0x65, 0x63, 0x6b, 0x41, 0x50, 0x49, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
+	0x6b, 0x65, 0x79, 0x22, 0x2b, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41, 0x50, 0x49, 0x4b,
+	0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x69, 0x64,
+	0x22, 0x45, 0x0a, 0x09, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
+	0x65, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x22, 0x14, 0x0a, 0x12, 0x48, 0x65, 0x61, 0x6c, 0x74,
+	0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x2d, 0x0a,
+	0x13, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x32, 0xe8, 0x01, 0x0a,
+	0x09, 0x43, 0x65, 0x6e, 0x74, 0x72, 0x61, 0x6c, 0x6f, 0x67, 0x12, 0x35, 0x0a, 0x06, 0x48, 0x65,
+	0x61, 0x6c, 0x74, 0x68, 0x12, 0x13, 0x2e, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65,
+	0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e, 0x48, 0x65, 0x61, 0x6c,
+	0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x12, 0x3a, 0x0a, 0x0b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41, 0x50, 0x49, 0x4b, 0x65, 0x79,
+	0x12, 0x13, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41, 0x50, 0x49, 0x4b, 0x65, 0x79, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x41, 0x50, 0x49,
+	0x4b, 0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x2a, 0x0a,
+	0x0a, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x4c, 0x6f, 0x67, 0x73, 0x12, 0x12, 0x2e, 0x46, 0x6f,
+	0x6c, 0x6c, 0x6f, 0x77, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x04, 0x2e, 0x4c, 0x6f, 0x67, 0x22, 0x00, 0x30, 0x01, 0x12, 0x3c, 0x0a, 0x0d, 0x47, 0x65, 0x74,
+	0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x12, 0x15, 0x2e, 0x47, 0x65, 0x74,
+	0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x12, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x22, 0x5a, 0x20, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x58, 0x69, 0x6f, 0x76, 0x56, 0x2f, 0x63, 0x65, 0x6e, 0x74,
+	0x72, 0x61, 0x6c, 0x6f, 0x67, 0x2d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -174,19 +532,33 @@ func file_grpc_centralog_proto_rawDescGZIP() []byte {
 	return file_grpc_centralog_proto_rawDescData
 }
 
-var file_grpc_centralog_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_grpc_centralog_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_grpc_centralog_proto_goTypes = []interface{}{
-	(*Log)(nil),               // 0: Log
-	(*FollowLogsRequest)(nil), // 1: FollowLogsRequest
+	(*Log)(nil),                  // 0: Log
+	(*FollowLogsRequest)(nil),    // 1: FollowLogsRequest
+	(*ContainerResponse)(nil),    // 2: ContainerResponse
+	(*GetContainersRequest)(nil), // 3: GetContainersRequest
+	(*CheckAPIKeyRequest)(nil),   // 4: CheckAPIKeyRequest
+	(*CheckAPIKeyResponse)(nil),  // 5: CheckAPIKeyResponse
+	(*Container)(nil),            // 6: Container
+	(*HealthCheckRequest)(nil),   // 7: HealthCheckRequest
+	(*HealthCheckResponse)(nil),  // 8: HealthCheckResponse
 }
 var file_grpc_centralog_proto_depIdxs = []int32{
-	1, // 0: Logs.FollowLogs:input_type -> FollowLogsRequest
-	0, // 1: Logs.FollowLogs:output_type -> Log
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	6, // 0: ContainerResponse.containers:type_name -> Container
+	7, // 1: Centralog.Health:input_type -> HealthCheckRequest
+	4, // 2: Centralog.CheckAPIKey:input_type -> CheckAPIKeyRequest
+	1, // 3: Centralog.FollowLogs:input_type -> FollowLogsRequest
+	3, // 4: Centralog.GetContainers:input_type -> GetContainersRequest
+	8, // 5: Centralog.Health:output_type -> HealthCheckResponse
+	5, // 6: Centralog.CheckAPIKey:output_type -> CheckAPIKeyResponse
+	0, // 7: Centralog.FollowLogs:output_type -> Log
+	2, // 8: Centralog.GetContainers:output_type -> ContainerResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_grpc_centralog_proto_init() }
@@ -219,6 +591,90 @@ func file_grpc_centralog_proto_init() {
 				return nil
 			}
 		}
+		file_grpc_centralog_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ContainerResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpc_centralog_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetContainersRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpc_centralog_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CheckAPIKeyRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpc_centralog_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CheckAPIKeyResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpc_centralog_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Container); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpc_centralog_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HealthCheckRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpc_centralog_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HealthCheckResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -226,7 +682,7 @@ func file_grpc_centralog_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_grpc_centralog_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
