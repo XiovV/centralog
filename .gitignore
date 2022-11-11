@@ -1,6 +1,6 @@
 centralog-agent
-db
+db.db
 .idea
 cmd/agent/agent
 cmd/cli/cli
-cmd/cli/db
+cmd/cli/db.db
