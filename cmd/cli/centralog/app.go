@@ -6,17 +6,20 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	pb "github.com/XiovV/centralog-agent/grpc"
+	"github.com/XiovV/centralog-agent/repository"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"io"
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"text/tabwriter"
 )
 
 type App struct {
 	centralogClient pb.CentralogClient
+	repository      *repository.SQLite
 }
 
 func NewApp() *App {
@@ -27,8 +30,11 @@ func NewApp() *App {
 
 	client := pb.NewCentralogClient(conn)
 
+	repo := repository.New()
+
 	return &App{
 		centralogClient: client,
+		repository:      repo,
 	}
 }
 
@@ -164,9 +170,18 @@ func (a *App) AddNodeWithPrompt() {
 			},
 		},
 		{
-			Name:     "name",
-			Prompt:   &survey.Input{Message: "Enter your node's custom name:"},
-			Validate: survey.Required,
+			Name:   "name",
+			Prompt: &survey.Input{Message: "Enter your node's custom name:"},
+			Validate: func(ans interface{}) error {
+				val := reflect.ValueOf(ans).String()
+
+				exists := a.repository.DoesNodeExist(val)
+				if exists {
+					return errors.New("a node with this name already exists, please choose a different name.")
+				}
+
+				return nil
+			},
 		},
 	}
 
@@ -181,20 +196,34 @@ func (a *App) AddNodeWithPrompt() {
 		log.Fatalln(err)
 	}
 
-	containers := []string{}
+	containersList := []string{}
 	for _, container := range a.getContainersRPC(client) {
-		containers = append(containers, fmt.Sprintf("%s (%s)", container.Name, container.State))
+		containersList = append(containersList, fmt.Sprintf("%s (%s)", container.Name, container.State))
 	}
 
 	prompt := &survey.MultiSelect{
 		Message: "Select containers:",
-		Options: containers,
+		Options: containersList,
 	}
 
-	survey.AskOne(prompt, &containers)
+	containersSelected := []string{}
+	survey.AskOne(prompt, &containersSelected)
 
 	fmt.Printf("Node %s added successfully\n", answers.Name)
-	fmt.Println("You selected:", containers)
+
+	containers := []string{}
+	for _, container := range containersSelected {
+		containers = append(containers, strings.Split(container, " ")[0])
+	}
+
+	node := repository.Node{
+		Location:   answers.Url,
+		APIKey:     answers.Key,
+		Name:       answers.Name,
+		Containers: strings.Join(containers, ","),
+	}
+
+	a.repository.InsertNode(node)
 }
 
 func (a *App) AddNodeWithFlags(url, apiKey, name string) {
