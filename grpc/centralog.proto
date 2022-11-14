@@ -8,6 +8,7 @@ service Centralog {
   rpc FollowLogs(FollowLogsRequest) returns (stream Log) {}
   rpc GetContainers(GetContainersRequest) returns (ContainerResponse) {}
   rpc GetRunningContainers(RunningContainers) returns (RunningContainers) {}
+  rpc GetContainersInfo(RunningContainers) returns (ContainerResponse) {}
 }
 
 message Log {

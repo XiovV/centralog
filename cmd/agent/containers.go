@@ -37,3 +37,19 @@ func (s *Server) GetRunningContainers(ctx context.Context, in *pb.RunningContain
 
 	return runningContainers, nil
 }
+
+func (s *Server) GetContainersInfo(ctx context.Context, in *pb.RunningContainers) (*pb.ContainerResponse, error) {
+	response := &pb.ContainerResponse{}
+
+	for _, container := range in.GetContainers() {
+		c, _ := s.Docker.GetContainer(container)
+
+		response.Containers = append(response.Containers, &pb.Container{
+			Id:    c.ID,
+			Name:  c.Names[0][1:],
+			State: c.State,
+		})
+	}
+
+	return response, nil
+}

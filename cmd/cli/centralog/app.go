@@ -78,24 +78,25 @@ func (a *App) ListNodesCmd() {
 	w.Flush()
 }
 
-func (a *App) ListContainersCmd(node string) {
-	if node != "node1" && node != "myNewNode" {
-		fmt.Println(node, "does not exist")
+func (a *App) ListContainersCmd(nodeName string) {
+	node, err := a.repository.GetNode(nodeName)
+	if err != nil {
+		fmt.Println("node does not exist")
 		return
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	response, err := a.centralogClient.GetContainersInfo(ctx, &pb.RunningContainers{Containers: strings.Split(node.Containers, ",")})
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(w, "NAME\tSTATUS")
-	if node == "node1" {
-		fmt.Fprintln(w, "instance1\tUP")
-		fmt.Fprintln(w, "instance2\tUP")
-		fmt.Fprintln(w, "instance3\tDOWN")
-	} else {
-		fmt.Fprintln(w, "instance1\tDOWN")
-		fmt.Fprintln(w, "instance2\tDOWN")
-		fmt.Fprintln(w, "instance3\tDOWN")
-		fmt.Fprintln(w, "instance4\tDOWN")
-		fmt.Fprintln(w, "instance5\tDOWN")
+
+	for _, container := range response.GetContainers() {
+		fmt.Fprintln(w, fmt.Sprintf("%s\t%s", container.Name, container.State))
 	}
 
 	w.Flush()

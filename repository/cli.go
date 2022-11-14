@@ -26,6 +26,18 @@ func (r *SQLite) GetNodes() ([]Node, error) {
 	return nodes, nil
 }
 
+func (r *SQLite) GetNode(name string) (Node, error) {
+	var node Node
+
+	err := r.db.Get(&node, "SELECT location, api_key, name, containers FROM nodes WHERE name = $1", name)
+	if err != nil {
+		fmt.Println(err)
+		return Node{}, err
+	}
+
+	return node, nil
+}
+
 func (r *SQLite) DoesNodeExist(name string) bool {
 	var node Node
 
