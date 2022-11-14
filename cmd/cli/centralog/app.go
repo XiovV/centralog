@@ -72,9 +72,6 @@ func (a *App) ListNodesCmd() {
 		fmt.Fprintln(w, out)
 	}
 
-	//fmt.Fprintln(w, "node1\t2/3\tUP\t")
-	//fmt.Fprintln(w, "myNewNode\t0/5\tDOWN\t")
-
 	w.Flush()
 }
 
