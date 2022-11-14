@@ -38,11 +38,42 @@ func NewApp() *App {
 	}
 }
 
+func newClient(target string) pb.CentralogClient {
+	conn, err := grpc.Dial("localhost:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return pb.NewCentralogClient(conn)
+}
+
 func (a *App) ListNodesCmd() {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)
 	fmt.Fprintln(w, "NAME\tCONTAINERS\tSTATUS\t")
-	fmt.Fprintln(w, "node1\t2/3\tUP\t")
-	fmt.Fprintln(w, "myNewNode\t0/5\tDOWN\t")
+
+	nodes, err := a.repository.GetNodes()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	for _, node := range nodes {
+		client := newClient(node.Location)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		response, err := client.GetRunningContainers(ctx, &pb.RunningContainers{Containers: strings.Split(node.Containers, ",")})
+		if err != nil {
+			out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, 0, len(strings.Split(node.Containers, ",")), "DOWN")
+			fmt.Fprintln(w, out)
+			log.Fatalln(err)
+		}
+
+		out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, len(response.GetContainers()), len(strings.Split(node.Containers, ",")), "UP")
+		fmt.Fprintln(w, out)
+	}
+
+	//fmt.Fprintln(w, "node1\t2/3\tUP\t")
+	//fmt.Fprintln(w, "myNewNode\t0/5\tDOWN\t")
 
 	w.Flush()
 }

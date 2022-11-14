@@ -13,7 +13,7 @@ var nodesCmd = &cobra.Command{
 	Use:   "nodes",
 	Short: "gives you a list of all of your nodes",
 	Run: func(cmd *cobra.Command, args []string) {
-		app := centralog.App{}
+		app := centralog.NewApp()
 		app.ListNodesCmd()
 	},
 }
