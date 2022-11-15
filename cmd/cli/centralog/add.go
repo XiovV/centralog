@@ -55,8 +55,6 @@ func (a *App) AddNodeWithPrompt() {
 	containersSelected := []string{}
 	survey.AskOne(prompt, &containersSelected)
 
-	fmt.Printf("Node %s added successfully\n", answers.Name)
-
 	containers := []string{}
 	for _, container := range containersSelected {
 		containers = append(containers, strings.Split(container, " ")[0])
@@ -73,6 +71,8 @@ func (a *App) AddNodeWithPrompt() {
 	if err != nil {
 		log.Fatalln("couldn't insert node:", err)
 	}
+
+	fmt.Printf("Node %s added successfully\n", answers.Name)
 }
 
 func (a *App) AddNodeWithFlags(url, apiKey, name string) {
@@ -87,12 +87,12 @@ func (a *App) validateURL(ans interface{}) error {
 		log.Fatalln("couldn't initiate client:", err)
 	}
 
+	a.centralogClient = client
+
 	err = a.pingServer()
 	if err != nil {
 		return errors.New("connection refused, please check your URL.")
 	}
-
-	a.centralogClient = client
 
 	return nil
 }
@@ -110,6 +110,14 @@ func (a *App) validateKey(ans interface{}) error {
 
 func (a *App) validateNodeName(ans interface{}) error {
 	val := reflect.ValueOf(ans).String()
+
+	if val == "" {
+		return errors.New("please provide a node name")
+	}
+
+	if strings.Contains(val, " ") {
+		return errors.New("node name should not contain spaces")
+	}
 
 	exists := a.repository.DoesNodeExist(val)
 	if exists {
