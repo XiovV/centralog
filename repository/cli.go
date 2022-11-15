@@ -11,8 +11,13 @@ type Node struct {
 	Containers string
 }
 
-func (r *SQLite) InsertNode(node Node) {
-	r.db.Exec("INSERT INTO nodes (location, api_key, name, containers) VALUES ($1, $2, $3, $4)", node.Location, node.APIKey, node.Name, node.Containers)
+func (r *SQLite) InsertNode(node Node) error {
+	_, err := r.db.Exec("INSERT INTO nodes (location, api_key, name, containers) VALUES ($1, $2, $3, $4)", node.Location, node.APIKey, node.Name, node.Containers)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *SQLite) GetNodes() ([]Node, error) {

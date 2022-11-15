@@ -5,7 +5,6 @@ import (
 	"github.com/XiovV/centralog-agent/repository"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 )
 
 type App struct {
@@ -14,26 +13,16 @@ type App struct {
 }
 
 func NewApp() *App {
-	conn, err := grpc.Dial("localhost:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	client := pb.NewCentralogClient(conn)
-
-	repo := repository.New()
-
 	return &App{
-		centralogClient: client,
-		repository:      repo,
+		repository: repository.New(),
 	}
 }
 
-func (a *App) newClient(target string) pb.CentralogClient {
+func (a *App) newClient(target string) (pb.CentralogClient, error) {
 	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
-	return pb.NewCentralogClient(conn)
+	return pb.NewCentralogClient(conn), nil
 }

@@ -69,7 +69,10 @@ func (a *App) AddNodeWithPrompt() {
 		Containers: strings.Join(containers, ","),
 	}
 
-	a.repository.InsertNode(node)
+	err = a.repository.InsertNode(node)
+	if err != nil {
+		log.Fatalln("couldn't insert node:", err)
+	}
 }
 
 func (a *App) AddNodeWithFlags(url, apiKey, name string) {
@@ -79,9 +82,12 @@ func (a *App) AddNodeWithFlags(url, apiKey, name string) {
 func (a *App) validateURL(ans interface{}) error {
 	val := reflect.ValueOf(ans).String()
 
-	client := a.newClient(val)
+	client, err := a.newClient(val)
+	if err != nil {
+		log.Fatalln("couldn't initiate client:", err)
+	}
 
-	err := a.pingServer(val)
+	err = a.pingServer()
 	if err != nil {
 		return errors.New("connection refused, please check your URL.")
 	}
@@ -94,7 +100,7 @@ func (a *App) validateURL(ans interface{}) error {
 func (a *App) validateKey(ans interface{}) error {
 	val := reflect.ValueOf(ans).String()
 
-	err := a.checkAPIKey(a.centralogClient, val)
+	err := a.checkAPIKey(val)
 	if err != nil {
 		return errors.New("api key is invalid")
 	}
@@ -121,7 +127,7 @@ func (a *App) getNodeContainers() []*pb.Container {
 	return response.Containers
 }
 
-func (a *App) pingServer(target string) error {
+func (a *App) pingServer() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -133,11 +139,11 @@ func (a *App) pingServer(target string) error {
 	return nil
 }
 
-func (a *App) checkAPIKey(client pb.CentralogClient, key string) error {
+func (a *App) checkAPIKey(key string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	_, err := client.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{Key: key})
+	_, err := a.centralogClient.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{Key: key})
 	if err != nil {
 		return err
 	}

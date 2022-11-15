@@ -16,19 +16,22 @@ func (a *App) ListNodesCmd() {
 
 	nodes, err := a.repository.GetNodes()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("couldn't get nodes:", err)
 	}
 
 	for _, node := range nodes {
-		client := a.newClient(node.Location)
+		client, err := a.newClient(node.Location)
+		if err != nil {
+			log.Fatalln("couldn't init client:", err)
+		}
 
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
+
 		response, err := client.GetRunningContainers(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
 		if err != nil {
 			out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, 0, len(strings.Split(node.Containers, ",")), "DOWN")
 			fmt.Fprintln(w, out)
-			log.Fatalln(err)
 		}
 
 		out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, len(response.GetContainers()), len(strings.Split(node.Containers, ",")), "UP")
@@ -47,9 +50,10 @@ func (a *App) ListContainersCmd(nodeName string) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
 	response, err := a.centralogClient.GetContainersInfo(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("couldn't get container info:", err)
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 5, ' ', 0)

@@ -9,7 +9,7 @@ import (
 func (s *Server) GetContainers(ctx context.Context, in *pb.GetContainersRequest) (*pb.ContainerResponse, error) {
 	containers, err := s.Docker.GetContainers()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("couldn't get containers:", err)
 	}
 
 	response := []*pb.Container{}
