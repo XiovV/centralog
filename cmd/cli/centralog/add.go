@@ -1,6 +1,7 @@
 package centralog
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
@@ -12,51 +13,21 @@ import (
 )
 
 func (a *App) AddNodeWithPrompt() {
-	var client pb.CentralogClient
-
 	qs := []*survey.Question{
 		{
-			Name:   "url",
-			Prompt: &survey.Input{Message: "Enter your node's URL:"},
-			Validate: func(ans interface{}) error {
-				val := reflect.ValueOf(ans).String()
-				c, err := a.pingServer(val)
-				if err != nil {
-					return errors.New("connection refused, please check your URL.")
-				}
-
-				client = c
-
-				return nil
-			},
+			Name:     "url",
+			Prompt:   &survey.Input{Message: "Enter your node's URL:"},
+			Validate: a.validateURL,
 		},
 		{
-			Name:   "key",
-			Prompt: &survey.Input{Message: "Enter your node's API key:"},
-			Validate: func(ans interface{}) error {
-				val := reflect.ValueOf(ans).String()
-
-				err := a.checkAPIKey(client, val)
-				if err != nil {
-					return errors.New("api key is invalid")
-				}
-
-				return nil
-			},
+			Name:     "key",
+			Prompt:   &survey.Input{Message: "Enter your node's API key:"},
+			Validate: a.validateKey,
 		},
 		{
-			Name:   "name",
-			Prompt: &survey.Input{Message: "Enter your node's custom name:"},
-			Validate: func(ans interface{}) error {
-				val := reflect.ValueOf(ans).String()
-
-				exists := a.repository.DoesNodeExist(val)
-				if exists {
-					return errors.New("a node with this name already exists, please choose a different name.")
-				}
-
-				return nil
-			},
+			Name:     "name",
+			Prompt:   &survey.Input{Message: "Enter your node's custom name:"},
+			Validate: a.validateNodeName,
 		},
 	}
 
@@ -72,7 +43,7 @@ func (a *App) AddNodeWithPrompt() {
 	}
 
 	containersList := []string{}
-	for _, container := range a.getContainersRPC(client) {
+	for _, container := range a.getNodeContainers() {
 		containersList = append(containersList, fmt.Sprintf("%s (%s)", container.Name, container.State))
 	}
 
@@ -103,4 +74,73 @@ func (a *App) AddNodeWithPrompt() {
 
 func (a *App) AddNodeWithFlags(url, apiKey, name string) {
 	fmt.Printf("Node %s added successfully\n", name)
+}
+
+func (a *App) validateURL(ans interface{}) error {
+	val := reflect.ValueOf(ans).String()
+
+	client := a.newClient(val)
+
+	err := a.pingServer(val)
+	if err != nil {
+		return errors.New("connection refused, please check your URL.")
+	}
+
+	a.centralogClient = client
+
+	return nil
+}
+
+func (a *App) validateKey(ans interface{}) error {
+	val := reflect.ValueOf(ans).String()
+
+	err := a.checkAPIKey(a.centralogClient, val)
+	if err != nil {
+		return errors.New("api key is invalid")
+	}
+
+	return nil
+}
+
+func (a *App) validateNodeName(ans interface{}) error {
+	val := reflect.ValueOf(ans).String()
+
+	exists := a.repository.DoesNodeExist(val)
+	if exists {
+		return errors.New("a node with this name already exists, please choose a different name.")
+	}
+
+	return nil
+}
+
+func (a *App) getNodeContainers() []*pb.Container {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	response, _ := a.centralogClient.GetContainers(ctx, &pb.GetContainersRequest{})
+
+	return response.Containers
+}
+
+func (a *App) pingServer(target string) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	_, err := a.centralogClient.Health(ctx, &pb.HealthCheckRequest{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) checkAPIKey(client pb.CentralogClient, key string) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	_, err := client.CheckAPIKey(ctx, &pb.CheckAPIKeyRequest{Key: key})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -29,7 +29,7 @@ func NewApp() *App {
 	}
 }
 
-func newClient(target string) pb.CentralogClient {
+func (a *App) newClient(target string) pb.CentralogClient {
 	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalln(err)
