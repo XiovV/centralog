@@ -7,8 +7,8 @@ service Centralog {
   rpc CheckAPIKey(CheckAPIKeyRequest) returns (CheckAPIKeyResponse) {}
   rpc FollowLogs(FollowLogsRequest) returns (stream Log) {}
   rpc GetContainers(GetContainersRequest) returns (ContainerResponse) {}
-  rpc GetRunningContainers(RunningContainers) returns (RunningContainers) {}
-  rpc GetContainersInfo(RunningContainers) returns (ContainerResponse) {}
+  rpc GetRunningContainers(Containers) returns (Containers) {}
+  rpc GetContainersInfo(Containers) returns (ContainerResponse) {}
 }
 
 message Log {
@@ -26,7 +26,7 @@ message ContainerResponse {
   repeated Container containers = 1;
 }
 
-message RunningContainers {
+message Containers {
   repeated string containers = 1;
 }
 

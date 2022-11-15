@@ -26,8 +26,8 @@ type CentralogClient interface {
 	CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*CheckAPIKeyResponse, error)
 	FollowLogs(ctx context.Context, in *FollowLogsRequest, opts ...grpc.CallOption) (Centralog_FollowLogsClient, error)
 	GetContainers(ctx context.Context, in *GetContainersRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	GetRunningContainers(ctx context.Context, in *RunningContainers, opts ...grpc.CallOption) (*RunningContainers, error)
-	GetContainersInfo(ctx context.Context, in *RunningContainers, opts ...grpc.CallOption) (*ContainerResponse, error)
+	GetRunningContainers(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*Containers, error)
+	GetContainersInfo(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*ContainerResponse, error)
 }
 
 type centralogClient struct {
@@ -97,8 +97,8 @@ func (c *centralogClient) GetContainers(ctx context.Context, in *GetContainersRe
 	return out, nil
 }
 
-func (c *centralogClient) GetRunningContainers(ctx context.Context, in *RunningContainers, opts ...grpc.CallOption) (*RunningContainers, error) {
-	out := new(RunningContainers)
+func (c *centralogClient) GetRunningContainers(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*Containers, error) {
+	out := new(Containers)
 	err := c.cc.Invoke(ctx, "/Centralog/GetRunningContainers", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (c *centralogClient) GetRunningContainers(ctx context.Context, in *RunningC
 	return out, nil
 }
 
-func (c *centralogClient) GetContainersInfo(ctx context.Context, in *RunningContainers, opts ...grpc.CallOption) (*ContainerResponse, error) {
+func (c *centralogClient) GetContainersInfo(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*ContainerResponse, error) {
 	out := new(ContainerResponse)
 	err := c.cc.Invoke(ctx, "/Centralog/GetContainersInfo", in, out, opts...)
 	if err != nil {
@@ -123,8 +123,8 @@ type CentralogServer interface {
 	CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*CheckAPIKeyResponse, error)
 	FollowLogs(*FollowLogsRequest, Centralog_FollowLogsServer) error
 	GetContainers(context.Context, *GetContainersRequest) (*ContainerResponse, error)
-	GetRunningContainers(context.Context, *RunningContainers) (*RunningContainers, error)
-	GetContainersInfo(context.Context, *RunningContainers) (*ContainerResponse, error)
+	GetRunningContainers(context.Context, *Containers) (*Containers, error)
+	GetContainersInfo(context.Context, *Containers) (*ContainerResponse, error)
 	mustEmbedUnimplementedCentralogServer()
 }
 
@@ -144,10 +144,10 @@ func (UnimplementedCentralogServer) FollowLogs(*FollowLogsRequest, Centralog_Fol
 func (UnimplementedCentralogServer) GetContainers(context.Context, *GetContainersRequest) (*ContainerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContainers not implemented")
 }
-func (UnimplementedCentralogServer) GetRunningContainers(context.Context, *RunningContainers) (*RunningContainers, error) {
+func (UnimplementedCentralogServer) GetRunningContainers(context.Context, *Containers) (*Containers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRunningContainers not implemented")
 }
-func (UnimplementedCentralogServer) GetContainersInfo(context.Context, *RunningContainers) (*ContainerResponse, error) {
+func (UnimplementedCentralogServer) GetContainersInfo(context.Context, *Containers) (*ContainerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContainersInfo not implemented")
 }
 func (UnimplementedCentralogServer) mustEmbedUnimplementedCentralogServer() {}
@@ -239,7 +239,7 @@ func _Centralog_GetContainers_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _Centralog_GetRunningContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RunningContainers)
+	in := new(Containers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -251,13 +251,13 @@ func _Centralog_GetRunningContainers_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/Centralog/GetRunningContainers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CentralogServer).GetRunningContainers(ctx, req.(*RunningContainers))
+		return srv.(CentralogServer).GetRunningContainers(ctx, req.(*Containers))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Centralog_GetContainersInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RunningContainers)
+	in := new(Containers)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func _Centralog_GetContainersInfo_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/Centralog/GetContainersInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CentralogServer).GetContainersInfo(ctx, req.(*RunningContainers))
+		return srv.(CentralogServer).GetContainersInfo(ctx, req.(*Containers))
 	}
 	return interceptor(ctx, in, info, handler)
 }

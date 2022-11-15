@@ -61,7 +61,7 @@ func (a *App) ListNodesCmd() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		response, err := client.GetRunningContainers(ctx, &pb.RunningContainers{Containers: strings.Split(node.Containers, ",")})
+		response, err := client.GetRunningContainers(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
 		if err != nil {
 			out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, 0, len(strings.Split(node.Containers, ",")), "DOWN")
 			fmt.Fprintln(w, out)
@@ -84,7 +84,7 @@ func (a *App) ListContainersCmd(nodeName string) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	response, err := a.centralogClient.GetContainersInfo(ctx, &pb.RunningContainers{Containers: strings.Split(node.Containers, ",")})
+	response, err := a.centralogClient.GetContainersInfo(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -24,8 +24,8 @@ func (s *Server) GetContainers(ctx context.Context, in *pb.GetContainersRequest)
 	return &pb.ContainerResponse{Containers: response}, nil
 }
 
-func (s *Server) GetRunningContainers(ctx context.Context, in *pb.RunningContainers) (*pb.RunningContainers, error) {
-	runningContainers := &pb.RunningContainers{}
+func (s *Server) GetRunningContainers(ctx context.Context, in *pb.Containers) (*pb.Containers, error) {
+	runningContainers := &pb.Containers{}
 
 	for _, container := range in.GetContainers() {
 		c, err := s.Docker.GetContainer(container)
@@ -38,7 +38,7 @@ func (s *Server) GetRunningContainers(ctx context.Context, in *pb.RunningContain
 	return runningContainers, nil
 }
 
-func (s *Server) GetContainersInfo(ctx context.Context, in *pb.RunningContainers) (*pb.ContainerResponse, error) {
+func (s *Server) GetContainersInfo(ctx context.Context, in *pb.Containers) (*pb.ContainerResponse, error) {
 	response := &pb.ContainerResponse{}
 
 	for _, container := range in.GetContainers() {
