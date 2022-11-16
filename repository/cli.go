@@ -1,9 +1,5 @@
 package repository
 
-import (
-	"fmt"
-)
-
 type Node struct {
 	Location   string
 	APIKey     string `db:"api_key"`
@@ -23,8 +19,7 @@ func (r *SQLite) InsertNode(node Node) error {
 func (r *SQLite) GetNodes() ([]Node, error) {
 	var nodes []Node
 
-	err := r.db.Select(&nodes, "SELECT location, api_key, name, containers FROM nodes")
-	if err != nil {
+	if err := r.db.Select(&nodes, "SELECT location, api_key, name, containers FROM nodes"); err != nil {
 		return nodes, err
 	}
 
@@ -34,20 +29,26 @@ func (r *SQLite) GetNodes() ([]Node, error) {
 func (r *SQLite) GetNode(name string) (Node, error) {
 	var node Node
 
-	err := r.db.Get(&node, "SELECT location, api_key, name, containers FROM nodes WHERE name = $1", name)
-	if err != nil {
+	if err := r.db.Get(&node, "SELECT location, api_key, name, containers FROM nodes WHERE name = $1", name); err != nil {
 		return Node{}, err
 	}
 
 	return node, nil
 }
 
+func (r *SQLite) UpdateNodeName(oldName, newName string) error {
+	_, err := r.db.Exec("UPDATE nodes SET name = $1 WHERE name = $2", newName, oldName)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *SQLite) DoesNodeExist(name string) bool {
 	var node Node
 
-	err := r.db.Get(&node, "SELECT name FROM nodes WHERE name = $1", name)
-	if err != nil {
-		fmt.Println(err)
+	if err := r.db.Get(&node, "SELECT name FROM nodes WHERE name = $1", name); err != nil {
 		return false
 	}
 
