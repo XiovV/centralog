@@ -20,7 +20,7 @@ func (a *App) ListNodesCmd() {
 	}
 
 	for _, node := range nodes {
-		client, err := a.newClient(node.Location)
+		err := a.initClient(node.Location)
 		if err != nil {
 			log.Fatalln("couldn't init client:", err)
 		}
@@ -28,7 +28,7 @@ func (a *App) ListNodesCmd() {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		response, err := client.GetRunningContainers(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
+		response, err := a.centralogClient.GetRunningContainers(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
 		if err != nil {
 			out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, 0, len(strings.Split(node.Containers, ",")), "DOWN")
 			fmt.Fprintln(w, out)

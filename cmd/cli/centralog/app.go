@@ -18,11 +18,13 @@ func NewApp() *App {
 	}
 }
 
-func (a *App) newClient(target string) (pb.CentralogClient, error) {
+func (a *App) initClient(target string) error {
 	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return pb.NewCentralogClient(conn), nil
+	a.centralogClient = pb.NewCentralogClient(conn)
+
+	return nil
 }

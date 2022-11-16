@@ -24,7 +24,90 @@ func (a *App) EditNodeCmd(nodeName string) {
 	switch selection {
 	case "Change node name":
 		a.editNodeNamePrompt(nodeName)
+	case "Change target URL":
+		a.editTargetURL(nodeName)
+	case "Change API key":
+		a.editAPIKey(nodeName)
 	}
+}
+
+func (a *App) editAPIKey(nodeName string) {
+	node, err := a.repository.GetNode(nodeName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = a.initClient(node.Location)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	qs := []*survey.Question{
+		{
+			Name:     "key",
+			Prompt:   &survey.Input{Message: "New API key:", Default: node.APIKey},
+			Validate: a.validateKey,
+		},
+		{
+			Name:   "confirm",
+			Prompt: &survey.Confirm{Message: "Are you sure that you want to change this API key?"},
+		},
+	}
+
+	var answers struct {
+		Key     string
+		Confirm bool
+	}
+
+	survey.Ask(qs, &answers)
+
+	if !answers.Confirm {
+		return
+	}
+
+	err = a.repository.UpdateAPIKey(nodeName, answers.Key)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println("API key successfully updated")
+}
+
+func (a *App) editTargetURL(nodeName string) {
+	node, err := a.repository.GetNode(nodeName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	qs := []*survey.Question{
+		{
+			Name:     "url",
+			Prompt:   &survey.Input{Message: "New target URL:", Default: node.Location},
+			Validate: a.validateURL,
+		},
+		{
+			Name:   "confirm",
+			Prompt: &survey.Confirm{Message: "Are you sure that you want to change this target URL?"},
+		},
+	}
+
+	var answers struct {
+		URL     string
+		Confirm bool
+	}
+
+	survey.Ask(qs, &answers)
+
+	if !answers.Confirm {
+		return
+	}
+
+	err = a.repository.UpdateTargetURL(nodeName, answers.URL)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println("Target URL successfully updated")
 }
 
 func (a *App) editNodeNamePrompt(nodeName string) {

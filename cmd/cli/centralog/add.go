@@ -88,12 +88,10 @@ func (a *App) AddNodeWithFlags(url, apiKey, name string) {
 func (a *App) validateURL(ans interface{}) error {
 	val := reflect.ValueOf(ans).String()
 
-	client, err := a.newClient(val)
+	err := a.initClient(val)
 	if err != nil {
 		log.Fatalln("couldn't initiate client:", err)
 	}
-
-	a.centralogClient = client
 
 	err = a.pingServer()
 	if err != nil {
