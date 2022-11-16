@@ -7,6 +7,7 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"github.com/XiovV/centralog-agent/repository"
+	"google.golang.org/grpc/metadata"
 	"log"
 	"reflect"
 	"strings"
@@ -42,8 +43,13 @@ func (a *App) AddNodeWithPrompt() {
 		log.Fatalln(err)
 	}
 
+	nodeContainers, err := a.getNodeContainers(answers.Key)
+	if err != nil {
+		log.Fatalln("couldn't fetch containers:", err)
+	}
+
 	containersList := []string{}
-	for _, container := range a.getNodeContainers() {
+	for _, container := range nodeContainers {
 		containersList = append(containersList, fmt.Sprintf("%s (%s)", container.Name, container.State))
 	}
 
@@ -127,12 +133,18 @@ func (a *App) validateNodeName(ans interface{}) error {
 	return nil
 }
 
-func (a *App) getNodeContainers() []*pb.Container {
+func (a *App) getNodeContainers(apiKey string) ([]*pb.Container, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	response, _ := a.centralogClient.GetContainers(ctx, &pb.GetContainersRequest{})
 
-	return response.Containers
+	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", "sdfsfsdf")
+
+	response, err := a.centralogClient.GetContainers(ctx, &pb.GetContainersRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Containers, nil
 }
 
 func (a *App) pingServer() error {

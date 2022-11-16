@@ -37,7 +37,7 @@ func (s *Server) Serve() error {
 		log.Fatal(err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(s.authenticateUnary), grpc.StreamInterceptor(s.authenticateStream))
 	pb.RegisterCentralogServer(grpcServer, s)
 
 	return grpcServer.Serve(lis)

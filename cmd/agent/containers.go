@@ -3,13 +3,16 @@ package main
 import (
 	"context"
 	pb "github.com/XiovV/centralog-agent/grpc"
-	"log"
+	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *Server) GetContainers(ctx context.Context, in *pb.GetContainersRequest) (*pb.ContainerResponse, error) {
 	containers, err := s.Docker.GetContainers()
 	if err != nil {
-		log.Fatalln("couldn't get containers:", err)
+		s.Logger.Error("couldn't get containers", zap.Error(err))
+		return nil, status.Error(codes.Internal, "couldn't get containers")
 	}
 
 	response := []*pb.Container{}
