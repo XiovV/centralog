@@ -135,7 +135,7 @@ func (a *App) getNodeContainers(apiKey string) ([]*pb.Container, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", "sdfsfsdf")
+	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", apiKey)
 
 	response, err := a.centralogClient.GetContainers(ctx, &pb.GetContainersRequest{})
 	if err != nil {
