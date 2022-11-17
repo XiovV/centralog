@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/XiovV/centralog-agent/docker"
 	docker2 "github.com/XiovV/centralog-agent/docker"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"github.com/XiovV/centralog-agent/repository"
+	"github.com/docker/docker/api/types"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
@@ -29,6 +31,7 @@ type Server struct {
 	Logger     *zap.Logger
 	Docker     *docker2.Controller
 	Repository *repository.SQLite
+	LogBuffer  *docker.LogBuffer
 }
 
 func (s *Server) Serve() error {
@@ -41,6 +44,23 @@ func (s *Server) Serve() error {
 	pb.RegisterCentralogServer(grpcServer, s)
 
 	return grpcServer.Serve(lis)
+}
+
+func (s *Server) ListenForLogs() error {
+	config, err := s.Repository.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	containers := config.GetContainers()
+
+	for _, container := range containers {
+		logWriter := docker.NewBackgroundLogWriter(s.LogBuffer, container)
+
+		go s.Docker.CollectLogs(container, logWriter, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
+	}
+
+	return nil
 }
 
 func (s *Server) Health(ctx context.Context, in *pb.HealthCheckRequest) (*pb.HealthCheckResponse, error) {

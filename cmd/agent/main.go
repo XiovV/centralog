@@ -28,23 +28,20 @@ func main() {
 
 	checkAPIKey(repo)
 
-	//containers := []string{"logserver1", "logserver2"}
-	//
-	//logBuffer := docker.NewLogBuffer(repo)
-	//
-	//for _, container := range containers {
-	//	logWriter := docker.NewBackgroundLogWriter(logBuffer, container)
-	//
-	//	go dockerController.CollectLogs(container, logWriter, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
-	//}
-
 	srv := Server{
 		Logger:     logger,
 		Docker:     dockerController,
 		Repository: repo,
+		LogBuffer:  docker.NewLogBuffer(repo),
 	}
 
-	logger.Info("running...", zap.String("port", os.Getenv("PORT")))
+	logger.Info("initialising log listener...")
+	err = srv.ListenForLogs()
+	if err != nil {
+		logger.Error("couldn't read config", zap.Error(err))
+	}
+
+	logger.Info("server is listening for requests...", zap.String("port", os.Getenv("PORT")))
 
 	srv.Serve()
 }

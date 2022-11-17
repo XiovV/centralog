@@ -14,6 +14,8 @@ func (s *Server) FollowLogs(request *pb.FollowLogsRequest, stream pb.Centralog_F
 		return status.Error(codes.InvalidArgument, "containers array empty")
 	}
 
+	s.LogBuffer.Flush()
+
 	options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true}
 
 	if !request.ShowAll {
