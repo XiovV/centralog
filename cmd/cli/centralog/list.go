@@ -48,6 +48,8 @@ func (a *App) ListContainersCmd(nodeName string) {
 		return
 	}
 
+	a.initClient(node.Location)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

@@ -36,8 +36,44 @@ func (r *SQLite) GetNode(name string) (Node, error) {
 	return node, nil
 }
 
+func (r *SQLite) DeleteNode(node string) error {
+	_, err := r.db.Exec("DELETE FROM nodes WHERE name = $1", node)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *SQLite) UpdateContainers(node, containers string) error {
+	_, err := r.db.Exec("UPDATE nodes SET containers = $1 WHERE name = $2", containers, node)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *SQLite) UpdateAPIKey(node, apiKey string) error {
+	_, err := r.db.Exec("UPDATE nodes SET api_key = $1 WHERE name = $2", apiKey, node)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *SQLite) UpdateNodeName(oldName, newName string) error {
 	_, err := r.db.Exec("UPDATE nodes SET name = $1 WHERE name = $2", newName, oldName)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *SQLite) UpdateTargetURL(node, url string) error {
+	_, err := r.db.Exec("UPDATE nodes SET location = $1 WHERE name = $2", url, node)
 	if err != nil {
 		return err
 	}

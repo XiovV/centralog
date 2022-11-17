@@ -1,6 +1,7 @@
 package centralog
 
 import (
+	"github.com/AlecAivazis/survey/v2"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"github.com/XiovV/centralog-agent/repository"
 	"google.golang.org/grpc"
@@ -27,4 +28,14 @@ func (a *App) initClient(target string) error {
 	a.centralogClient = pb.NewCentralogClient(conn)
 
 	return nil
+}
+
+func (a *App) confirmationPrompt(text string) bool {
+	var confirmation bool
+	prompt := &survey.Confirm{
+		Message: text,
+	}
+	survey.AskOne(prompt, &confirmation)
+
+	return confirmation
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// containersCmd represents the containers command
-var containersCmd = &cobra.Command{
+// listContainersCmd represents the containers command
+var listContainersCmd = &cobra.Command{
 	Use:   "containers",
 	Short: "used to show containers for a specific node",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -21,5 +21,5 @@ var containersCmd = &cobra.Command{
 }
 
 func init() {
-	listCmd.AddCommand(containersCmd)
+	listCmd.AddCommand(listContainersCmd)
 }
