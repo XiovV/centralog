@@ -1,10 +1,16 @@
 package repository
 
+import "strings"
+
 type Node struct {
 	Location   string
 	APIKey     string `db:"api_key"`
 	Name       string
 	Containers string
+}
+
+func (n *Node) GetContainers() []string {
+	return strings.Split(n.Containers, ",")
 }
 
 func (r *SQLite) InsertNode(node Node) error {

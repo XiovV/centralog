@@ -20,8 +20,9 @@ var logsCmd = &cobra.Command{
 	Short: "shows logs",
 	Run: func(cmd *cobra.Command, args []string) {
 		app := centralog.NewApp()
-		app.ShowLogs(containers)
+		app.ShowLogs(args[0], containers)
 	},
+	Args: cobra.ExactArgs(1),
 }
 
 func init() {

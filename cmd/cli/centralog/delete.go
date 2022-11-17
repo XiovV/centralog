@@ -82,11 +82,7 @@ func (a *App) DeleteNodeCmd(nodeName string, force bool) {
 		return
 	}
 
-	var confirmation bool
-	prompt := &survey.Confirm{
-		Message: "Are you sure that you want to delete " + nodeName + "?",
-	}
-	survey.AskOne(prompt, &confirmation)
+	confirmation := a.confirmationPrompt("Are you sure that you want to delete " + nodeName + "?")
 
 	if !confirmation {
 		return
