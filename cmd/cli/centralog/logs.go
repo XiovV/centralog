@@ -3,6 +3,7 @@ package centralog
 import (
 	"context"
 	"fmt"
+	//"github.com/XiovV/centralog-agent/cmd/cli/cmd"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"google.golang.org/grpc/metadata"
 	"io"
@@ -10,7 +11,15 @@ import (
 	"time"
 )
 
-func (a *App) ShowLogs(nodeName string, containersFlag []string) {
+type ShowLogsFlags struct {
+	Containers []string
+	ShowAll    bool
+	Follow     bool
+	First      int32
+	Last       int32
+}
+
+func (a *App) ShowLogs(nodeName string, flags ShowLogsFlags) {
 	node, err := a.repository.GetNode(nodeName)
 	if err != nil {
 		log.Fatalln(err)
@@ -27,16 +36,19 @@ func (a *App) ShowLogs(nodeName string, containersFlag []string) {
 	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.APIKey)
 
 	containers := node.GetContainers()
-	if len(containersFlag) >= 1 {
-		containers = containersFlag
+	if len(flags.Containers) >= 1 {
+		containers = flags.Containers
 	}
 
-	request := &pb.FollowLogsRequest{
+	request := &pb.GetLogsRequest{
 		Containers: containers,
-		ShowAll:    false,
+		ShowAll:    flags.ShowAll,
+		Follow:     true,
+		First:      flags.First,
+		Last:       flags.Last,
 	}
 
-	stream, err := a.centralogClient.FollowLogs(ctx, request)
+	stream, err := a.centralogClient.GetLogs(ctx, request)
 	if err != nil {
 		log.Fatalf("error initialising stream: %v", err)
 	}

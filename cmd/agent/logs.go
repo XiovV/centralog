@@ -9,37 +9,63 @@ import (
 	"sync"
 )
 
-func (s *Server) FollowLogs(request *pb.FollowLogsRequest, stream pb.Centralog_FollowLogsServer) error {
+func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogsServer) error {
 	if len(request.Containers) == 0 {
 		return status.Error(codes.InvalidArgument, "containers array empty")
 	}
 
 	s.LogBuffer.Flush()
 
-	options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true}
+	options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Timestamps: true}
 
-	if !request.ShowAll {
-		options.Since = "0m"
+	if request.GetFollow() {
+		options.Follow = true
+
+		if !request.ShowAll {
+			options.Since = "0m"
+		}
+
+		stopSignals := []chan struct{}{}
+
+		var wg sync.WaitGroup
+
+		wg.Add(1)
+		for _, container := range request.Containers {
+			stopSignal := make(chan struct{})
+			stopSignals = append(stopSignals, stopSignal)
+
+			logWriter := docker2.NewServerLogWriter(stopSignal, container, stream)
+
+			go s.Docker.CollectLogsBackground(container, logWriter, options)
+		}
+
+		// since the logs are being collected inside goroutines, we have to wait until
+		// the client closes the connection so the connection doesn't get instantly
+		// dropped by the server.
+		select {
+		case <-stream.Context().Done():
+			for _, signal := range stopSignals {
+				signal <- struct{}{}
+			}
+			wg.Done()
+		}
+
+		wg.Wait()
 	}
-
-	for _, container := range request.Containers {
-		logWriter := docker2.NewServerLogWriter(container, stream)
-
-		go s.Docker.CollectLogs(container, logWriter, options)
-	}
-
-	var wg sync.WaitGroup
-
-	// since the logs are being collected inside goroutines, we have to wait until
-	// the client closes the connection so the connection doesn't get instantly
-	// dropped by the server.
-	wg.Add(1)
-	select {
-	case <-stream.Context().Done():
-		wg.Done()
-	}
-
-	wg.Wait()
 
 	return nil
 }
+
+//func (s *Server) followLogs(flags *pb.GetLogsRequest, options types.ContainerLogsOptions, stream pb.Centralog_GetLogsServer) {
+//	options.Follow = true
+//
+//	if !flags.ShowAll {
+//		options.Since = "0m"
+//	}
+//
+//	for _, container := range flags.Containers {
+//		logWriter := docker2.NewServerLogWriter(container, stream)
+//
+//		go s.Docker.CollectLogs(container, logWriter, options)
+//	}
+//}

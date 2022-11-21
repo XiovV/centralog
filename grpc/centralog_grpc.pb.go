@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type CentralogClient interface {
 	Health(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 	CheckAPIKey(ctx context.Context, in *CheckAPIKeyRequest, opts ...grpc.CallOption) (*CheckAPIKeyResponse, error)
-	FollowLogs(ctx context.Context, in *FollowLogsRequest, opts ...grpc.CallOption) (Centralog_FollowLogsClient, error)
+	GetLogs(ctx context.Context, in *GetLogsRequest, opts ...grpc.CallOption) (Centralog_GetLogsClient, error)
 	GetContainers(ctx context.Context, in *GetContainersRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	GetRunningContainers(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*Containers, error)
 	GetContainersInfo(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*ContainerResponse, error)
@@ -56,12 +56,12 @@ func (c *centralogClient) CheckAPIKey(ctx context.Context, in *CheckAPIKeyReques
 	return out, nil
 }
 
-func (c *centralogClient) FollowLogs(ctx context.Context, in *FollowLogsRequest, opts ...grpc.CallOption) (Centralog_FollowLogsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Centralog_ServiceDesc.Streams[0], "/Centralog/FollowLogs", opts...)
+func (c *centralogClient) GetLogs(ctx context.Context, in *GetLogsRequest, opts ...grpc.CallOption) (Centralog_GetLogsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Centralog_ServiceDesc.Streams[0], "/Centralog/GetLogs", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &centralogFollowLogsClient{stream}
+	x := &centralogGetLogsClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -71,16 +71,16 @@ func (c *centralogClient) FollowLogs(ctx context.Context, in *FollowLogsRequest,
 	return x, nil
 }
 
-type Centralog_FollowLogsClient interface {
+type Centralog_GetLogsClient interface {
 	Recv() (*Log, error)
 	grpc.ClientStream
 }
 
-type centralogFollowLogsClient struct {
+type centralogGetLogsClient struct {
 	grpc.ClientStream
 }
 
-func (x *centralogFollowLogsClient) Recv() (*Log, error) {
+func (x *centralogGetLogsClient) Recv() (*Log, error) {
 	m := new(Log)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (c *centralogClient) GetContainersInfo(ctx context.Context, in *Containers,
 type CentralogServer interface {
 	Health(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*CheckAPIKeyResponse, error)
-	FollowLogs(*FollowLogsRequest, Centralog_FollowLogsServer) error
+	GetLogs(*GetLogsRequest, Centralog_GetLogsServer) error
 	GetContainers(context.Context, *GetContainersRequest) (*ContainerResponse, error)
 	GetRunningContainers(context.Context, *Containers) (*Containers, error)
 	GetContainersInfo(context.Context, *Containers) (*ContainerResponse, error)
@@ -138,8 +138,8 @@ func (UnimplementedCentralogServer) Health(context.Context, *HealthCheckRequest)
 func (UnimplementedCentralogServer) CheckAPIKey(context.Context, *CheckAPIKeyRequest) (*CheckAPIKeyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAPIKey not implemented")
 }
-func (UnimplementedCentralogServer) FollowLogs(*FollowLogsRequest, Centralog_FollowLogsServer) error {
-	return status.Errorf(codes.Unimplemented, "method FollowLogs not implemented")
+func (UnimplementedCentralogServer) GetLogs(*GetLogsRequest, Centralog_GetLogsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetLogs not implemented")
 }
 func (UnimplementedCentralogServer) GetContainers(context.Context, *GetContainersRequest) (*ContainerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContainers not implemented")
@@ -199,24 +199,24 @@ func _Centralog_CheckAPIKey_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Centralog_FollowLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(FollowLogsRequest)
+func _Centralog_GetLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetLogsRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(CentralogServer).FollowLogs(m, &centralogFollowLogsServer{stream})
+	return srv.(CentralogServer).GetLogs(m, &centralogGetLogsServer{stream})
 }
 
-type Centralog_FollowLogsServer interface {
+type Centralog_GetLogsServer interface {
 	Send(*Log) error
 	grpc.ServerStream
 }
 
-type centralogFollowLogsServer struct {
+type centralogGetLogsServer struct {
 	grpc.ServerStream
 }
 
-func (x *centralogFollowLogsServer) Send(m *Log) error {
+func (x *centralogGetLogsServer) Send(m *Log) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -304,8 +304,8 @@ var Centralog_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "FollowLogs",
-			Handler:       _Centralog_FollowLogs_Handler,
+			StreamName:    "GetLogs",
+			Handler:       _Centralog_GetLogs_Handler,
 			ServerStreams: true,
 		},
 	},

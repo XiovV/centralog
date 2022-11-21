@@ -12,6 +12,10 @@ import (
 var (
 	json       bool
 	containers []string
+	showAll    bool
+	follow     bool
+	first      int32
+	last       int32
 )
 
 // logsCmd represents the logs command
@@ -20,7 +24,17 @@ var logsCmd = &cobra.Command{
 	Short: "shows logs",
 	Run: func(cmd *cobra.Command, args []string) {
 		app := centralog.NewApp()
-		app.ShowLogs(args[0], containers)
+
+		nodeName := args[0]
+		flags := centralog.ShowLogsFlags{
+			Containers: containers,
+			ShowAll:    showAll,
+			Follow:     follow,
+			First:      first,
+			Last:       last,
+		}
+
+		app.ShowLogs(nodeName, flags)
 	},
 	Args: cobra.ExactArgs(1),
 }
@@ -28,6 +42,10 @@ var logsCmd = &cobra.Command{
 func init() {
 	logsCmd.Flags().BoolVarP(&json, "json", "j", false, "json output")
 	logsCmd.Flags().StringSliceVarP(&containers, "containers", "c", []string{}, "exampleContainer1,exampleContainer2,exampleContainer3")
+	logsCmd.Flags().BoolVarP(&showAll, "all", "a", false, "shows all logs")
+	logsCmd.Flags().BoolVarP(&follow, "follow", "f", true, "receive logs in real time")
+	logsCmd.Flags().Int32Var(&first, "first", 0, "shows first n amount of logs")
+	logsCmd.Flags().Int32Var(&last, "last", 0, "shows last n amount of logs")
 
 	rootCmd.AddCommand(logsCmd)
 }

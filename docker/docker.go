@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"github.com/XiovV/centralog-agent/repository"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -35,6 +36,18 @@ func (c *Controller) CollectLogs(container string, writer io.Writer, options typ
 	out, _ := c.cli.ContainerLogs(c.ctx, containerId, options)
 
 	stdcopy.StdCopy(writer, writer, out)
+}
+
+func (c *Controller) CollectLogsBackground(container string, writer io.Writer, options types.ContainerLogsOptions) {
+	containerId := c.FindContainerIDByName(container)
+
+	out, _ := c.cli.ContainerLogs(c.ctx, containerId, options)
+
+	_, err := stdcopy.StdCopy(writer, writer, out)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 func (c *Controller) FindContainerIDByName(name string) string {

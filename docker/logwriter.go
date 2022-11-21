@@ -1,6 +1,8 @@
 package docker
 
 import (
+	"errors"
+	"fmt"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"strings"
 	"time"
@@ -48,7 +50,8 @@ func NewBackgroundLogWriter(buf *LogBuffer, containerId string) *BackgroundLogWr
 
 type ServerLogWriter struct {
 	containerId string
-	stream      pb.Centralog_FollowLogsServer
+	stream      pb.Centralog_GetLogsServer
+	stopSignal  chan struct{}
 }
 
 func (l *ServerLogWriter) Write(p []byte) (int, error) {
@@ -56,15 +59,24 @@ func (l *ServerLogWriter) Write(p []byte) (int, error) {
 
 	log := parseLog(str, l.containerId)
 
-	l.stream.Send(&pb.Log{
+	err := l.stream.Send(&pb.Log{
 		Container: log.ContainerID,
 		Timestamp: log.Timestamp,
 		Message:   log.Message,
 	})
 
-	return len(p), nil
+	if err != nil {
+		fmt.Println("stream err:", err, "container:", log.ContainerID)
+	}
+
+	select {
+	case <-l.stopSignal:
+		return 0, errors.New("stopping " + log.ContainerID)
+	default:
+		return len(p), nil
+	}
 }
 
-func NewServerLogWriter(container string, stream pb.Centralog_FollowLogsServer) *ServerLogWriter {
-	return &ServerLogWriter{containerId: container, stream: stream}
+func NewServerLogWriter(stopSignal chan struct{}, container string, stream pb.Centralog_GetLogsServer) *ServerLogWriter {
+	return &ServerLogWriter{containerId: container, stream: stream, stopSignal: stopSignal}
 }

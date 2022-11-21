@@ -5,7 +5,7 @@ option go_package = "github.com/XiovV/centralog-agent";
 service Centralog {
   rpc Health(HealthCheckRequest) returns (HealthCheckResponse) {}
   rpc CheckAPIKey(CheckAPIKeyRequest) returns (CheckAPIKeyResponse) {}
-  rpc FollowLogs(FollowLogsRequest) returns (stream Log) {}
+  rpc GetLogs(GetLogsRequest) returns (stream Log) {}
   rpc GetContainers(GetContainersRequest) returns (ContainerResponse) {}
   rpc GetRunningContainers(Containers) returns (Containers) {}
   rpc GetContainersInfo(Containers) returns (ContainerResponse) {}
@@ -17,9 +17,12 @@ message Log {
   string message = 3;
 }
 
-message FollowLogsRequest {
+message GetLogsRequest {
   repeated string containers = 1;
   bool showAll = 2;
+  bool follow = 3;
+  int32 first = 4;
+  int32 last = 5;
 }
 
 message ContainerResponse {
