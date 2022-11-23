@@ -2,7 +2,6 @@ package docker
 
 import (
 	"errors"
-	"fmt"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"strings"
 	"time"
@@ -39,8 +38,6 @@ func (l *BackgroundLogWriter) Write(p []byte) (int, error) {
 
 	l.buf.WriteLog(log)
 
-	//fmt.Printf("containerId: %s message: %s", l.containerId, log.Message)
-
 	return len(p), nil
 }
 
@@ -59,15 +56,11 @@ func (l *ServerLogWriter) Write(p []byte) (int, error) {
 
 	log := parseLog(str, l.containerId)
 
-	err := l.stream.Send(&pb.Log{
+	l.stream.Send(&pb.Log{
 		Container: log.ContainerID,
 		Timestamp: log.Timestamp,
 		Message:   log.Message,
 	})
-
-	if err != nil {
-		fmt.Println("stream err:", err, "container:", log.ContainerID)
-	}
 
 	select {
 	case <-l.stopSignal:

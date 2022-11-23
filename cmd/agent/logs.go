@@ -1,7 +1,7 @@
 package main
 
 import (
-	docker2 "github.com/XiovV/centralog-agent/docker"
+	"github.com/XiovV/centralog-agent/docker"
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"github.com/docker/docker/api/types"
 	"google.golang.org/grpc/codes"
@@ -34,9 +34,9 @@ func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogs
 			stopSignal := make(chan struct{})
 			stopSignals = append(stopSignals, stopSignal)
 
-			logWriter := docker2.NewServerLogWriter(stopSignal, container, stream)
+			logWriter := docker.NewServerLogWriter(stopSignal, container, stream)
 
-			go s.Docker.CollectLogsBackground(container, logWriter, options)
+			go s.Docker.CollectLogs(container, logWriter, options)
 		}
 
 		// since the logs are being collected inside goroutines, we have to wait until
@@ -55,17 +55,3 @@ func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogs
 
 	return nil
 }
-
-//func (s *Server) followLogs(flags *pb.GetLogsRequest, options types.ContainerLogsOptions, stream pb.Centralog_GetLogsServer) {
-//	options.Follow = true
-//
-//	if !flags.ShowAll {
-//		options.Since = "0m"
-//	}
-//
-//	for _, container := range flags.Containers {
-//		logWriter := docker2.NewServerLogWriter(container, stream)
-//
-//		go s.Docker.CollectLogs(container, logWriter, options)
-//	}
-//}

@@ -35,14 +35,6 @@ func (c *Controller) CollectLogs(container string, writer io.Writer, options typ
 
 	out, _ := c.cli.ContainerLogs(c.ctx, containerId, options)
 
-	stdcopy.StdCopy(writer, writer, out)
-}
-
-func (c *Controller) CollectLogsBackground(container string, writer io.Writer, options types.ContainerLogsOptions) {
-	containerId := c.FindContainerIDByName(container)
-
-	out, _ := c.cli.ContainerLogs(c.ctx, containerId, options)
-
 	_, err := stdcopy.StdCopy(writer, writer, out)
 	if err != nil {
 		fmt.Println(err)
