@@ -23,6 +23,7 @@ const (
 	STAGING_ENV    = "STAGING"
 	PRODUCTION_ENV = "PROD"
 	KEY_LENGTH     = 41
+	RATE_LIMTI     = 5
 )
 
 type Server struct {
@@ -32,6 +33,7 @@ type Server struct {
 	Docker     *docker2.Controller
 	Repository *repository.SQLite
 	LogBuffer  *docker.LogBuffer
+	RateLimit  *Limiter
 }
 
 func (s *Server) Serve() error {
@@ -68,7 +70,14 @@ func (s *Server) Health(ctx context.Context, in *pb.HealthCheckRequest) (*pb.Hea
 }
 
 func (s *Server) CheckAPIKey(ctx context.Context, in *pb.CheckAPIKeyRequest) (*pb.CheckAPIKeyResponse, error) {
+	ok := s.RateLimit.Try()
+	if !ok {
+		s.Logger.Warn("check api key failed attempts limit reached")
+		return &pb.CheckAPIKeyResponse{Valid: false}, status.Error(codes.InvalidArgument, fmt.Sprintf("rate limit exceeded, please try again in a few minutes"))
+	}
+
 	if len(in.GetKey()) > KEY_LENGTH {
+		s.RateLimit.Fail()
 		return &pb.CheckAPIKeyResponse{Valid: false}, status.Error(codes.InvalidArgument, "api key is too long")
 	}
 
@@ -76,6 +85,8 @@ func (s *Server) CheckAPIKey(ctx context.Context, in *pb.CheckAPIKeyRequest) (*p
 
 	err := bcrypt.CompareHashAndPassword(key, []byte(in.GetKey()))
 	if err != nil {
+		s.RateLimit.Fail()
+		s.Logger.Warn("api key is incorrect")
 		return &pb.CheckAPIKeyResponse{Valid: false}, status.Error(codes.InvalidArgument, "api key is invalid")
 	}
 

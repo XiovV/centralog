@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"time"
 )
 
 var (
@@ -26,6 +27,8 @@ func main() {
 	repo := repository.New()
 	dockerController := docker.New(repo)
 
+	rateLimiter := NewLimiter(5, 60*time.Second)
+
 	checkAPIKey(repo)
 
 	srv := Server{
@@ -33,6 +36,7 @@ func main() {
 		Docker:     dockerController,
 		Repository: repo,
 		LogBuffer:  docker.NewLogBuffer(repo),
+		RateLimit:  rateLimiter,
 	}
 
 	logger.Info("initialising log listener...")
