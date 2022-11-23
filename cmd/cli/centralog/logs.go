@@ -43,7 +43,7 @@ func (a *App) ShowLogs(nodeName string, flags ShowLogsFlags) {
 	request := &pb.GetLogsRequest{
 		Containers: containers,
 		ShowAll:    flags.ShowAll,
-		Follow:     true,
+		Follow:     flags.Follow,
 		First:      flags.First,
 		Last:       flags.Last,
 	}

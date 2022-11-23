@@ -29,9 +29,12 @@ var logsCmd = &cobra.Command{
 		flags := centralog.ShowLogsFlags{
 			Containers: containers,
 			ShowAll:    showAll,
-			Follow:     follow,
 			First:      first,
 			Last:       last,
+		}
+
+		if last > 0 || first > 0 {
+			flags.Follow = false
 		}
 
 		app.ShowLogs(nodeName, flags)
