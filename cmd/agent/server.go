@@ -34,9 +34,13 @@ type Server struct {
 	Repository *repository.SQLite
 	LogBuffer  *docker.LogBuffer
 	RateLimit  *Limiter
+
+	apiKey []byte
 }
 
 func (s *Server) Serve() error {
+	s.apiKey = s.Repository.GetAPIKey()
+
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", os.Getenv("PORT")))
 	if err != nil {
 		log.Fatal(err)
@@ -81,9 +85,7 @@ func (s *Server) CheckAPIKey(ctx context.Context, in *pb.CheckAPIKeyRequest) (*p
 		return &pb.CheckAPIKeyResponse{Valid: false}, status.Error(codes.InvalidArgument, "api key is too long")
 	}
 
-	key := s.Repository.GetAPIKey()
-
-	err := bcrypt.CompareHashAndPassword(key, []byte(in.GetKey()))
+	err := bcrypt.CompareHashAndPassword(s.apiKey, []byte(in.GetKey()))
 	if err != nil {
 		s.RateLimit.Fail()
 		s.Logger.Warn("api key is incorrect")
