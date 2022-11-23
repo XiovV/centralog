@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	pb "github.com/XiovV/centralog-agent/grpc"
+	"google.golang.org/grpc/metadata"
 	"log"
 	"os"
 	"strings"
@@ -27,6 +28,8 @@ func (a *App) ListNodesCmd() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
+
+		ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.APIKey)
 
 		response, err := a.centralogClient.GetRunningContainers(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
 		if err != nil {
@@ -52,6 +55,8 @@ func (a *App) ListContainersCmd(nodeName string) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.APIKey)
 
 	response, err := a.centralogClient.GetContainersInfo(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
 	if err != nil {
