@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 	"sync"
 )
 
@@ -27,6 +28,36 @@ func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogs
 
 		wg.Wait()
 		return nil
+	}
+
+	if request.GetLast() > 0 {
+		logs, err := s.Repository.GetLastNLogs(request.GetLast())
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		for _, log := range logs {
+			stream.Send(&pb.Log{
+				Container: log.ContainerID,
+				Timestamp: log.Timestamp,
+				Message:   log.Message,
+			})
+		}
+	}
+
+	if request.GetFirst() > 0 {
+		logs, err := s.Repository.GetFirstNLogs(request.GetFirst())
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		for _, log := range logs {
+			stream.Send(&pb.Log{
+				Container: log.ContainerID,
+				Timestamp: log.Timestamp,
+				Message:   log.Message,
+			})
+		}
 	}
 
 	return nil
