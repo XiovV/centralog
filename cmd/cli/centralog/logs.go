@@ -48,7 +48,7 @@ func (a *App) ShowLogs(nodeName string, flags ShowLogsFlags) {
 		Last:       flags.Last,
 	}
 
-	fmt.Println(request)
+	fmt.Println("request struct:", request)
 
 	stream, err := a.centralogClient.GetLogs(ctx, request)
 	if err != nil {

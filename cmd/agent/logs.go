@@ -19,25 +19,33 @@ func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogs
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	s.LogBuffer.Flush()
-
 	options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Timestamps: true}
 
-	if request.GetFollow() {
-		wg := new(sync.WaitGroup)
-		s.followLogs(wg, options, stream, request)
-
-		wg.Wait()
-		return nil
-	}
-
 	if request.GetFirst() > 0 || request.GetLast() > 0 {
+		s.LogBuffer.Flush()
+
 		logs, err := s.getNLogs(request.GetFirst(), request.GetLast())
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		s.sendLogs(logs, stream)
+
+		if request.GetFollow() {
+			wg := new(sync.WaitGroup)
+			s.followLogs(wg, options, stream, request)
+
+			wg.Wait()
+		}
+
+		return nil
+	}
+
+	if request.GetFollow() {
+		wg := new(sync.WaitGroup)
+		s.followLogs(wg, options, stream, request)
+
+		wg.Wait()
 		return nil
 	}
 

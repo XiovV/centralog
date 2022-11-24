@@ -34,8 +34,12 @@ var logsCmd = &cobra.Command{
 			Follow:     true,
 		}
 
-		if last > 0 || first > 0 {
+		if first > 0 || last > 0 {
 			flags.Follow = false
+		}
+
+		if follow {
+			flags.Follow = true
 		}
 
 		app.ShowLogs(nodeName, flags)
@@ -47,7 +51,7 @@ func init() {
 	logsCmd.Flags().BoolVarP(&json, "json", "j", false, "json output")
 	logsCmd.Flags().StringSliceVarP(&containers, "containers", "c", []string{}, "exampleContainer1,exampleContainer2,exampleContainer3")
 	logsCmd.Flags().BoolVarP(&showAll, "all", "a", false, "shows all logs")
-	logsCmd.Flags().BoolVarP(&follow, "follow", "f", true, "receive logs in real time")
+	logsCmd.Flags().BoolVarP(&follow, "follow", "f", false, "receive logs in real time")
 	logsCmd.Flags().Int32Var(&first, "first", 0, "shows first n amount of logs")
 	logsCmd.Flags().Int32Var(&last, "last", 0, "shows last n amount of logs")
 
