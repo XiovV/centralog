@@ -54,7 +54,7 @@ func (s *Server) getNLogs(first, last int32) ([]repository.Log, error) {
 		return logs, nil
 	}
 
-	logs, err := s.Repository.GetLastNLogs(first)
+	logs, err := s.Repository.GetLastNLogs(last)
 	if err != nil {
 		return nil, err
 	}
