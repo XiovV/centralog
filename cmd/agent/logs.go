@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/XiovV/centralog-agent/docker"
 	pb "github.com/XiovV/centralog-agent/grpc"
+	"github.com/XiovV/centralog-agent/repository"
 	"github.com/docker/docker/api/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,37 +31,45 @@ func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogs
 		return nil
 	}
 
-	if request.GetLast() > 0 {
-		logs, err := s.Repository.GetLastNLogs(request.GetLast())
+	if request.GetFirst() > 0 || request.GetLast() > 0 {
+		logs, err := s.getNLogs(request.GetFirst(), request.GetLast())
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		for _, log := range logs {
-			stream.Send(&pb.Log{
-				Container: log.ContainerID,
-				Timestamp: log.Timestamp,
-				Message:   log.Message,
-			})
-		}
-	}
-
-	if request.GetFirst() > 0 {
-		logs, err := s.Repository.GetFirstNLogs(request.GetFirst())
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		for _, log := range logs {
-			stream.Send(&pb.Log{
-				Container: log.ContainerID,
-				Timestamp: log.Timestamp,
-				Message:   log.Message,
-			})
-		}
+		s.sendLogs(logs, stream)
+		return nil
 	}
 
 	return nil
+}
+
+func (s *Server) getNLogs(first, last int32) ([]repository.Log, error) {
+	if first > 0 {
+		logs, err := s.Repository.GetFirstNLogs(first)
+		if err != nil {
+			return nil, err
+		}
+
+		return logs, nil
+	}
+
+	logs, err := s.Repository.GetLastNLogs(first)
+	if err != nil {
+		return nil, err
+	}
+
+	return logs, nil
+}
+
+func (s *Server) sendLogs(logs []repository.Log, stream pb.Centralog_GetLogsServer) {
+	for _, log := range logs {
+		stream.Send(&pb.Log{
+			Container: log.ContainerID,
+			Timestamp: log.Timestamp,
+			Message:   log.Message,
+		})
+	}
 }
 
 func (s *Server) validateGetLogsRequest(request *pb.GetLogsRequest) error {
@@ -80,6 +89,7 @@ func (s *Server) validateGetLogsRequest(request *pb.GetLogsRequest) error {
 }
 
 func (s *Server) followLogs(wg *sync.WaitGroup, options types.ContainerLogsOptions, stream pb.Centralog_GetLogsServer, request *pb.GetLogsRequest) {
+	s.Logger.Info("follow logs")
 	options.Follow = true
 
 	if !request.ShowAll {

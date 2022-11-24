@@ -48,6 +48,8 @@ func (a *App) ShowLogs(nodeName string, flags ShowLogsFlags) {
 		Last:       flags.Last,
 	}
 
+	fmt.Println(request)
+
 	stream, err := a.centralogClient.GetLogs(ctx, request)
 	if err != nil {
 		log.Fatalf("error initialising stream: %v", err)

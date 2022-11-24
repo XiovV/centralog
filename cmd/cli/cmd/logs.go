@@ -31,6 +31,7 @@ var logsCmd = &cobra.Command{
 			ShowAll:    showAll,
 			First:      first,
 			Last:       last,
+			Follow:     true,
 		}
 
 		if last > 0 || first > 0 {
