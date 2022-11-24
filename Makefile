@@ -12,7 +12,7 @@ logservers:
 .PHONY: stop
 stop:
 	@echo 'Stopping logservers...'
-	docker stop logserver1 logserver1
+	docker stop logserver1 logserver2
 
 .PHONY: start
 start:
