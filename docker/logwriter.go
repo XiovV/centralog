@@ -26,6 +26,10 @@ func parseLog(log, containerId string) Log {
 	}
 }
 
+func NewBackgroundLogWriter(buf *LogBuffer, containerId string) *BackgroundLogWriter {
+	return &BackgroundLogWriter{buf: buf, containerId: containerId}
+}
+
 type BackgroundLogWriter struct {
 	buf         *LogBuffer
 	containerId string
@@ -39,10 +43,6 @@ func (l *BackgroundLogWriter) Write(p []byte) (int, error) {
 	l.buf.WriteLog(log)
 
 	return len(p), nil
-}
-
-func NewBackgroundLogWriter(buf *LogBuffer, containerId string) *BackgroundLogWriter {
-	return &BackgroundLogWriter{buf: buf, containerId: containerId}
 }
 
 type ServerLogWriter struct {

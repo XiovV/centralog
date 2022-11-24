@@ -16,6 +16,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 const (
@@ -60,10 +61,29 @@ func (s *Server) ListenForLogs() error {
 
 	containers := config.GetContainers()
 
-	for _, container := range containers {
-		logWriter := docker.NewBackgroundLogWriter(s.LogBuffer, container)
+	for _, containerName := range containers {
+		options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true}
 
-		go s.Docker.CollectLogs(container, logWriter, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true, Since: "0m"})
+		s.Logger.Info("getting container", zap.String("containerName", containerName))
+
+		_, err := s.Docker.GetContainer(containerName)
+
+		if err != nil {
+			s.Logger.Info("couldn't get container", zap.String("containerName", containerName), zap.Error(err))
+			return nil
+		}
+
+		timestamp, err := s.Repository.GetLastTimestamp(containerName)
+		if err != nil {
+			s.Logger.Warn("couldn't get last timestamp:", zap.Error(err))
+			return err
+		}
+
+		options.Since = time.UnixMilli(timestamp + 1).Format("2006-01-02T15:04:05.999999999")
+
+		logWriter := docker.NewBackgroundLogWriter(s.LogBuffer, containerName)
+
+		go s.Docker.CollectLogs(containerName, logWriter, options)
 	}
 
 	return nil

@@ -1,5 +1,7 @@
 package repository
 
+import "database/sql"
+
 type LogMessage map[string]interface{}
 
 type Log struct {
@@ -10,6 +12,16 @@ type Log struct {
 
 func (r *SQLite) StoreLogs(logs []LogMessage) {
 	r.db.NamedExec("INSERT INTO logs (message, containerID, timestamp ) VALUES (:message, :containerID, :timestamp)", logs)
+}
+
+func (r *SQLite) GetLastTimestamp(container string) (int64, error) {
+	var timestamp sql.NullInt64
+
+	if err := r.db.Get(&timestamp, "SELECT max(timestamp) AS timestamp FROM logs WHERE containerID = $1", container); err != nil {
+		return 0, err
+	}
+
+	return timestamp.Int64, nil
 }
 
 func (r *SQLite) GetLastNLogs(n int32) ([]Log, error) {

@@ -42,7 +42,7 @@ func main() {
 	logger.Info("initialising log listener...")
 	err = srv.ListenForLogs()
 	if err != nil {
-		logger.Error("couldn't read config", zap.Error(err))
+		logger.Error("couldn't start listening for logs", zap.Error(err))
 	}
 
 	logger.Info("server is listening for requests...", zap.String("port", os.Getenv("PORT")))
