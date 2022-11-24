@@ -19,10 +19,11 @@ func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogs
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	s.LogBuffer.Flush()
+
 	options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Timestamps: true}
 
 	if request.GetFirst() > 0 || request.GetLast() > 0 {
-		s.LogBuffer.Flush()
 
 		logs, err := s.getNLogs(request.GetFirst(), request.GetLast())
 		if err != nil {
@@ -100,9 +101,16 @@ func (s *Server) followLogs(wg *sync.WaitGroup, options types.ContainerLogsOptio
 	s.Logger.Info("follow logs")
 	options.Follow = true
 
-	if !request.ShowAll {
-		options.Since = "0m"
+	if request.ShowAll {
+		logs, err := s.Repository.GetAllLogs()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		s.sendLogs(logs, stream)
 	}
+
+	options.Since = "0m"
 
 	stopSignals := []chan struct{}{}
 

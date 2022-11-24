@@ -10,6 +10,16 @@ type Log struct {
 	Timestamp   int64
 }
 
+func (r *SQLite) GetAllLogs() ([]Log, error) {
+	logs := []Log{}
+
+	if err := r.db.Select(&logs, "SELECT * FROM logs ORDER BY timestamp ASC"); err != nil {
+		return nil, err
+	}
+
+	return logs, nil
+}
+
 func (r *SQLite) StoreLogs(logs []LogMessage) {
 	r.db.NamedExec("INSERT INTO logs (message, containerID, timestamp ) VALUES (:message, :containerID, :timestamp)", logs)
 }
