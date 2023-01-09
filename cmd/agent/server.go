@@ -15,7 +15,6 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
-	"os"
 	"time"
 )
 
@@ -30,6 +29,7 @@ type Server struct {
 	pb.UnimplementedCentralogServer
 
 	Logger     *zap.Logger
+	Config     *Config
 	Docker     *docker2.Controller
 	Repository *repository.SQLite
 	LogBuffer  *docker.LogBuffer
@@ -41,7 +41,7 @@ type Server struct {
 func (s *Server) Serve() error {
 	s.apiKey = s.Repository.GetAPIKey()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", os.Getenv("PORT")))
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", s.Config.Port))
 	if err != nil {
 		log.Fatal(err)
 	}
