@@ -24,7 +24,6 @@ func (s *Server) GetLogs(request *pb.GetLogsRequest, stream pb.Centralog_GetLogs
 	options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Timestamps: true}
 
 	if request.GetFirst() > 0 || request.GetLast() > 0 {
-
 		logs, err := s.getNLogs(request.GetFirst(), request.GetLast())
 		if err != nil {
 			log.Fatalln(err)
