@@ -24,6 +24,12 @@ func main() {
 
 	defer logger.Sync()
 
+	config, err := NewConfig()
+	if err != nil {
+		logger.Error("couldn't read config", zap.Error(err))
+		return
+	}
+
 	repo := repository.New()
 	dockerController := docker.New(repo)
 
@@ -33,6 +39,7 @@ func main() {
 
 	srv := Server{
 		Logger:     logger,
+		Config:     config,
 		Docker:     dockerController,
 		Repository: repo,
 		LogBuffer:  docker.NewLogBuffer(repo),
@@ -45,7 +52,7 @@ func main() {
 		logger.Error("couldn't start listening for logs", zap.Error(err))
 	}
 
-	logger.Info("server is listening for requests...", zap.String("port", os.Getenv("PORT")))
+	logger.Info("server is listening for requests...", zap.String("port", config.Port))
 
 	srv.Serve()
 }
