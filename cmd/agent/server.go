@@ -24,7 +24,6 @@ const (
 	STAGING_ENV    = "STAGING"
 	PRODUCTION_ENV = "PROD"
 	KEY_LENGTH     = 41
-	RATE_LIMTI     = 5
 )
 
 type Server struct {
