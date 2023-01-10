@@ -69,6 +69,7 @@ func checkAPIKey(r *repository.SQLite) {
 }
 
 func generateHashedAPIKey() ([]byte, string) {
+	rand.Seed(time.Now().UnixNano())
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 	s := make([]rune, KEY_LENGTH)
