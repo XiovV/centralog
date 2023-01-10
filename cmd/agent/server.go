@@ -60,6 +60,10 @@ func (s *Server) ListenForLogs() error {
 
 	containers := config.GetContainers()
 
+	if len(containers) == 0 {
+		return nil
+	}
+
 	for _, containerName := range containers {
 		options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Timestamps: true}
 
