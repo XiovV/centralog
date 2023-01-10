@@ -38,7 +38,7 @@ func migrate(db *sqlx.DB) {
 	localTableSchema := `
 	CREATE TABLE IF NOT EXISTS local(
 	    api_key BLOB,
-	    containers TEXT
+	    containers TEXT DEFAULT ''
 	);
 `
 
