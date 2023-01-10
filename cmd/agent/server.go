@@ -41,7 +41,7 @@ type Server struct {
 func (s *Server) Serve() error {
 	s.apiKey = s.Repository.GetAPIKey()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", s.Config.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", s.Config.Port))
 	if err != nil {
 		log.Fatal(err)
 	}
