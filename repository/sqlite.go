@@ -29,12 +29,10 @@ func New() *SQLite {
 		log.Fatalln(err)
 	}
 
-	migrate(db)
-
 	return &SQLite{db: db}
 }
 
-func migrate(db *sqlx.DB) {
+func (r *SQLite) MigrateAgentDatabase() {
 	localTableSchema := `
 	CREATE TABLE IF NOT EXISTS local(
 	    api_key BLOB,
@@ -50,6 +48,18 @@ func migrate(db *sqlx.DB) {
 	);
 `
 
-	db.MustExec(localTableSchema)
-	db.MustExec(logsSchema)
+	r.db.MustExec(localTableSchema)
+	r.db.MustExec(logsSchema)
+}
+
+func (r *SQLite) MigrateClientDatabase() {
+	nodesSchema := `
+	CREATE TABLE IF NOT EXISTS nodes(
+		location TEXT NOT NULL,
+		api_key TEXT NOT NULL,
+		name TEXT NOT NULL UNIQUE
+	);
+`
+
+	r.db.MustExec(nodesSchema)
 }
