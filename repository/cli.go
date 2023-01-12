@@ -1,20 +1,13 @@
 package repository
 
-import "strings"
-
 type Node struct {
-	Location   string
-	APIKey     string `db:"api_key"`
-	Name       string
-	Containers string
-}
-
-func (n *Node) GetContainers() []string {
-	return strings.Split(n.Containers, ",")
+	Location string
+	APIKey   string `db:"api_key"`
+	Name     string
 }
 
 func (r *SQLite) InsertNode(node Node) error {
-	_, err := r.db.Exec("INSERT INTO nodes (location, api_key, name, containers) VALUES ($1, $2, $3, $4)", node.Location, node.APIKey, node.Name, node.Containers)
+	_, err := r.db.Exec("INSERT INTO nodes (location, api_key, name) VALUES ($1, $2, $3)", node.Location, node.APIKey, node.Name)
 	if err != nil {
 		return err
 	}
