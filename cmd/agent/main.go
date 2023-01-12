@@ -31,6 +31,8 @@ func main() {
 	}
 
 	repo := repository.New()
+	repo.MigrateAgentDatabase()
+
 	dockerController := docker.New(repo)
 
 	rateLimiter := NewLimiter(5, 60*time.Second)
