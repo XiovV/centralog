@@ -35,6 +35,7 @@ func (a *App) ListNodesCmd() {
 		if err != nil {
 			out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, 0, len(strings.Split(node.Containers, ",")), "DOWN")
 			fmt.Fprintln(w, out)
+			continue
 		}
 
 		out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, len(response.GetContainers()), len(strings.Split(node.Containers, ",")), "UP")
