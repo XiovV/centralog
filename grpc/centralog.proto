@@ -8,7 +8,7 @@ service Centralog {
   rpc GetLogs(GetLogsRequest) returns (stream Log) {}
   rpc GetContainers(GetContainersRequest) returns (ContainerResponse) {}
   rpc GetRunningContainers(Containers) returns (Containers) {}
-  rpc GetContainersInfo(Containers) returns (ContainerResponse) {}
+  rpc GetContainersInfo(GetContainersInfoRequest) returns (ContainerResponse) {}
 }
 
 message Log {
@@ -34,6 +34,10 @@ message Containers {
 }
 
 message GetContainersRequest {
+
+}
+
+message GetContainersInfoRequest {
 
 }
 

@@ -27,7 +27,7 @@ type CentralogClient interface {
 	GetLogs(ctx context.Context, in *GetLogsRequest, opts ...grpc.CallOption) (Centralog_GetLogsClient, error)
 	GetContainers(ctx context.Context, in *GetContainersRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	GetRunningContainers(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*Containers, error)
-	GetContainersInfo(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*ContainerResponse, error)
+	GetContainersInfo(ctx context.Context, in *GetContainersInfoRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 }
 
 type centralogClient struct {
@@ -106,7 +106,7 @@ func (c *centralogClient) GetRunningContainers(ctx context.Context, in *Containe
 	return out, nil
 }
 
-func (c *centralogClient) GetContainersInfo(ctx context.Context, in *Containers, opts ...grpc.CallOption) (*ContainerResponse, error) {
+func (c *centralogClient) GetContainersInfo(ctx context.Context, in *GetContainersInfoRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
 	out := new(ContainerResponse)
 	err := c.cc.Invoke(ctx, "/Centralog/GetContainersInfo", in, out, opts...)
 	if err != nil {
@@ -124,7 +124,7 @@ type CentralogServer interface {
 	GetLogs(*GetLogsRequest, Centralog_GetLogsServer) error
 	GetContainers(context.Context, *GetContainersRequest) (*ContainerResponse, error)
 	GetRunningContainers(context.Context, *Containers) (*Containers, error)
-	GetContainersInfo(context.Context, *Containers) (*ContainerResponse, error)
+	GetContainersInfo(context.Context, *GetContainersInfoRequest) (*ContainerResponse, error)
 	mustEmbedUnimplementedCentralogServer()
 }
 
@@ -147,7 +147,7 @@ func (UnimplementedCentralogServer) GetContainers(context.Context, *GetContainer
 func (UnimplementedCentralogServer) GetRunningContainers(context.Context, *Containers) (*Containers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRunningContainers not implemented")
 }
-func (UnimplementedCentralogServer) GetContainersInfo(context.Context, *Containers) (*ContainerResponse, error) {
+func (UnimplementedCentralogServer) GetContainersInfo(context.Context, *GetContainersInfoRequest) (*ContainerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContainersInfo not implemented")
 }
 func (UnimplementedCentralogServer) mustEmbedUnimplementedCentralogServer() {}
@@ -257,7 +257,7 @@ func _Centralog_GetRunningContainers_Handler(srv interface{}, ctx context.Contex
 }
 
 func _Centralog_GetContainersInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Containers)
+	in := new(GetContainersInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func _Centralog_GetContainersInfo_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/Centralog/GetContainersInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CentralogServer).GetContainersInfo(ctx, req.(*Containers))
+		return srv.(CentralogServer).GetContainersInfo(ctx, req.(*GetContainersInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
