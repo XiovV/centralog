@@ -3,5 +3,5 @@ db.db
 .idea
 cmd/agent/agent
 cmd/cli/cli
-cmd/cli/db.db
+cmd/cli/data
 data
