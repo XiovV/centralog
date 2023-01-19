@@ -28,7 +28,7 @@ func (r *SQLite) GetNodes() ([]Node, error) {
 func (r *SQLite) GetNode(name string) (Node, error) {
 	var node Node
 
-	if err := r.db.Get(&node, "SELECT location, api_key, name, containers FROM nodes WHERE name = $1", name); err != nil {
+	if err := r.db.Get(&node, "SELECT location, api_key, name FROM nodes WHERE name = $1", name); err != nil {
 		return Node{}, err
 	}
 
