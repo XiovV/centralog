@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/XiovV/centralog-agent/docker"
 	docker2 "github.com/XiovV/centralog-agent/docker"
@@ -61,6 +62,7 @@ func (s *Server) ListenForLogs() error {
 	containers := config.GetContainers()
 
 	if len(containers) == 0 {
+		s.Logger.Error("cannot monitor containers for logs", zap.Error(errors.New("no containers in the containers field")))
 		return nil
 	}
 
@@ -70,7 +72,6 @@ func (s *Server) ListenForLogs() error {
 		s.Logger.Info("getting container", zap.String("containerName", containerName))
 
 		_, err := s.Docker.GetContainer(containerName)
-
 		if err != nil {
 			s.Logger.Info("couldn't get container", zap.String("containerName", containerName), zap.Error(err))
 			return nil
