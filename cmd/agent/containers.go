@@ -27,10 +27,16 @@ func (s *Server) GetContainers(ctx context.Context, in *pb.GetContainersRequest)
 	return &pb.ContainerResponse{Containers: response}, nil
 }
 
-func (s *Server) GetContainersInfo(ctx context.Context, in *pb.Containers) (*pb.ContainerResponse, error) {
+func (s *Server) GetContainersInfo(ctx context.Context, in *pb.GetContainersInfoRequest) (*pb.ContainerResponse, error) {
 	response := &pb.ContainerResponse{}
 
-	for _, container := range in.GetContainers() {
+	config, err := s.Repository.GetConfig()
+	if err != nil {
+		s.Logger.Error("couldn't get config", zap.Error(err))
+		return nil, status.Error(codes.Internal, "couldn't get containers")
+	}
+
+	for _, container := range config.GetContainers() {
 		c, _ := s.Docker.GetContainer(container)
 
 		response.Containers = append(response.Containers, &pb.Container{
