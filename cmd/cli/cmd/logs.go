@@ -19,7 +19,7 @@ var (
 
 // logsCmd represents the logs command
 var logsCmd = &cobra.Command{
-	Use:   "logs",
+	Use:   "logs [node name]",
 	Short: "shows logs",
 	Run: func(cmd *cobra.Command, args []string) {
 		app := centralog.NewApp()
