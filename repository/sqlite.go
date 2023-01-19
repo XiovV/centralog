@@ -35,6 +35,7 @@ func New() *SQLite {
 func (r *SQLite) MigrateAgentDatabase() {
 	localTableSchema := `
 	CREATE TABLE IF NOT EXISTS local(
+	    id SERIAL PRIMARY KEY NOT NULL,
 	    api_key BLOB,
 	    containers TEXT DEFAULT ''
 	);
