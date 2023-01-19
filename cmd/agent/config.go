@@ -30,7 +30,3 @@ func NewConfig() (*Config, error) {
 
 	return &cfg, err
 }
-
-//func (c *Config) GetContainers() []string {
-//	return strings.Split(c.Containers, ",")
-//}
