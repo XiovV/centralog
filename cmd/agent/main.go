@@ -9,7 +9,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 )
 
@@ -49,16 +48,32 @@ func main() {
 		RateLimit:  rateLimiter,
 	}
 
-	//TODO: implement MONITOR_ALL_CONTAINERS
 	if len(config.Containers) > 0 {
 		logger.Info("storing containers", zap.Strings("containers", config.Containers))
-		repo.StoreContainers(strings.Join(config.Containers, ","))
+		repo.StoreContainers(config.Containers)
+	}
+
+	if config.MonitorAllContainers {
+		logger.Info("monitoring all containers")
+		allContainers, err := dockerController.GetContainers()
+		if err != nil {
+			logger.Error("couldn't get containers")
+			return
+		}
+
+		containersToStore := []string{}
+		for _, container := range allContainers {
+			containersToStore = append(containersToStore, container.Names[0][1:])
+		}
+
+		repo.StoreContainers(containersToStore)
 	}
 
 	logger.Info("initialising log listener...")
 	err = srv.ListenForLogs()
 	if err != nil {
 		logger.Error("couldn't start listening for logs", zap.Error(err))
+		return
 	}
 
 	logger.Info("server is listening for requests...", zap.String("port", config.Port))
