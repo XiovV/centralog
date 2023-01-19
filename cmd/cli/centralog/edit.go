@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"log"
-	"strings"
 )
 
 func (a *App) EditNodeCmd(nodeName string) {
@@ -17,7 +16,7 @@ func (a *App) EditNodeCmd(nodeName string) {
 
 	prompt := &survey.Select{
 		Message: "Settings for " + nodeName,
-		Options: []string{"Change node name", "Change target URL", "Change API key", "Change containers"},
+		Options: []string{"Change node name", "Change target URL", "Change API key"},
 	}
 
 	survey.AskOne(prompt, &selection)
@@ -29,68 +28,7 @@ func (a *App) EditNodeCmd(nodeName string) {
 		a.editTargetURL(nodeName)
 	case "Change API key":
 		a.editAPIKey(nodeName)
-	case "Change containers":
-		a.editContainers(nodeName)
 	}
-}
-
-func (a *App) editContainers(nodeName string) {
-	node, err := a.repository.GetNode(nodeName)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	err = a.initClient(node.Location)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	nodeContainers, err := a.getNodeContainers(node.APIKey)
-	if err != nil {
-		log.Fatalln("couldn't fetch containers:", err)
-	}
-
-	containersList := []string{}
-	for _, container := range nodeContainers {
-		containersList = append(containersList, fmt.Sprintf("%s (%s)", container.Name, container.State))
-	}
-
-	qs := []*survey.Question{
-		{
-			Name: "containers",
-			Prompt: &survey.MultiSelect{
-				Message: "Select containers:",
-				Options: containersList,
-			},
-		},
-		{
-			Name:   "confirm",
-			Prompt: &survey.Confirm{Message: "Are you sure that you want to use these containers?"},
-		},
-	}
-
-	var answers struct {
-		Containers []string
-		Confirm    bool
-	}
-
-	survey.Ask(qs, &answers)
-
-	if !answers.Confirm {
-		return
-	}
-
-	containers := []string{}
-	for _, container := range answers.Containers {
-		containers = append(containers, strings.Split(container, " ")[0])
-	}
-
-	err = a.repository.UpdateContainers(nodeName, strings.Join(containers, ","))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	fmt.Println("Containers updated successfully")
 }
 
 func (a *App) editAPIKey(nodeName string) {
@@ -133,6 +71,7 @@ func (a *App) editAPIKey(nodeName string) {
 	}
 
 	fmt.Println("API key successfully updated")
+	a.EditNodeCmd(nodeName)
 }
 
 func (a *App) editTargetURL(nodeName string) {
@@ -170,6 +109,7 @@ func (a *App) editTargetURL(nodeName string) {
 	}
 
 	fmt.Println("Target URL successfully updated")
+	a.EditNodeCmd(nodeName)
 }
 
 func (a *App) editNodeNamePrompt(nodeName string) {
@@ -202,4 +142,5 @@ func (a *App) editNodeNamePrompt(nodeName string) {
 	}
 
 	fmt.Println("Node successfully renamed")
+	a.EditNodeCmd(answers.Name)
 }
