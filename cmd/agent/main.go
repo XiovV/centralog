@@ -51,7 +51,7 @@ func main() {
 
 	//TODO: implement MONITOR_ALL_CONTAINERS
 	if len(config.Containers) > 0 {
-		fmt.Println("storing containers")
+		logger.Info("storing containers", zap.Strings("containers", config.Containers))
 		repo.StoreContainers(strings.Join(config.Containers, ","))
 	}
 
