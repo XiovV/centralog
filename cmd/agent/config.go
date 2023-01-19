@@ -1,14 +1,15 @@
 package main
 
 import (
+	"errors"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	Port                 string `env:"PORT" env-default:"8080"`
-	Environment          string `env:"ENV" env-default:"PRODUCTION"`
-	MonitorAllContainers bool   `env:"MONITOR_ALL_CONTAINERS" env-default:"false"`
-	Containers           string `env:"CONTAINERS" env-default:""`
+	Port                 string   `env:"PORT" env-default:"8080"`
+	Environment          string   `env:"ENV" env-default:"PRODUCTION"`
+	MonitorAllContainers bool     `env:"MONITOR_ALL_CONTAINERS" env-default:"false"`
+	Containers           []string `env:"CONTAINERS" env-default:""`
 }
 
 func NewConfig() (*Config, error) {
@@ -19,5 +20,13 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 
+	if !cfg.MonitorAllContainers && len(cfg.Containers) == 0 {
+		return nil, errors.New("MONITOR_ALL_CONTAINERS or CONTAINERS environment variables should be specified")
+	}
+
 	return &cfg, err
 }
+
+//func (c *Config) GetContainers() []string {
+//	return strings.Split(c.Containers, ",")
+//}
