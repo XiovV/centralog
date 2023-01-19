@@ -43,34 +43,10 @@ func (a *App) AddNodeWithPrompt() {
 		log.Fatalln(err)
 	}
 
-	nodeContainers, err := a.getNodeContainers(answers.Key)
-	if err != nil {
-		log.Fatalln("couldn't fetch containers:", err)
-	}
-
-	containersList := []string{}
-	for _, container := range nodeContainers {
-		containersList = append(containersList, fmt.Sprintf("%s (%s)", container.Name, container.State))
-	}
-
-	prompt := &survey.MultiSelect{
-		Message: "Select containers:",
-		Options: containersList,
-	}
-
-	containersSelected := []string{}
-	survey.AskOne(prompt, &containersSelected)
-
-	containers := []string{}
-	for _, container := range containersSelected {
-		containers = append(containers, strings.Split(container, " ")[0])
-	}
-
 	node := repository.Node{
-		Location:   answers.Url,
-		APIKey:     answers.Key,
-		Name:       answers.Name,
-		Containers: strings.Join(containers, ","),
+		Location: answers.Url,
+		APIKey:   answers.Key,
+		Name:     answers.Name,
 	}
 
 	err = a.repository.InsertNode(node)
