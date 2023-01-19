@@ -35,20 +35,13 @@ func (a *App) ShowLogs(nodeName string, flags ShowLogsFlags) {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.APIKey)
 
-	containers := node.GetContainers()
-	if len(flags.Containers) >= 1 {
-		containers = flags.Containers
-	}
-
 	request := &pb.GetLogsRequest{
-		Containers: containers,
+		Containers: flags.Containers,
 		ShowAll:    flags.ShowAll,
 		Follow:     flags.Follow,
 		First:      flags.First,
 		Last:       flags.Last,
 	}
-
-	fmt.Println("request struct:", request)
 
 	stream, err := a.centralogClient.GetLogs(ctx, request)
 	if err != nil {
