@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -46,6 +47,12 @@ func main() {
 		Repository: repo,
 		LogBuffer:  docker.NewLogBuffer(repo),
 		RateLimit:  rateLimiter,
+	}
+
+	//TODO: implement MONITOR_ALL_CONTAINERS
+	if len(config.Containers) > 0 {
+		fmt.Println("storing containers")
+		repo.StoreContainers(strings.Join(config.Containers, ","))
 	}
 
 	logger.Info("initialising log listener...")
