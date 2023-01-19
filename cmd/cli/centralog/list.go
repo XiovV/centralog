@@ -7,7 +7,6 @@ import (
 	"google.golang.org/grpc/metadata"
 	"log"
 	"os"
-	"strings"
 	"text/tabwriter"
 )
 
@@ -31,18 +30,30 @@ func (a *App) ListNodesCmd() {
 
 		ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.APIKey)
 
-		response, err := a.centralogClient.GetRunningContainers(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
+		response, err := a.centralogClient.GetContainersInfo(ctx, &pb.GetContainersInfoRequest{})
 		if err != nil {
-			out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, 0, len(strings.Split(node.Containers, ",")), "DOWN")
+			out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, 0, 0, "DOWN")
 			fmt.Fprintln(w, out)
 			continue
 		}
 
-		out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, len(response.GetContainers()), len(strings.Split(node.Containers, ",")), "UP")
+		out := fmt.Sprintf("%s\t%d/%d\t%s", node.Name, getNumberOfRunningContainers(response.GetContainers()), len(response.GetContainers()), "UP")
 		fmt.Fprintln(w, out)
 	}
 
 	w.Flush()
+}
+
+func getNumberOfRunningContainers(containers []*pb.Container) int {
+	count := 0
+
+	for _, container := range containers {
+		if container.GetState() == "running" {
+			count++
+		}
+	}
+
+	return count
 }
 
 func (a *App) ListContainersCmd(nodeName string) {
@@ -59,7 +70,7 @@ func (a *App) ListContainersCmd(nodeName string) {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", node.APIKey)
 
-	response, err := a.centralogClient.GetContainersInfo(ctx, &pb.Containers{Containers: strings.Split(node.Containers, ",")})
+	response, err := a.centralogClient.GetContainersInfo(ctx, &pb.GetContainersInfoRequest{})
 	if err != nil {
 		log.Fatalln("couldn't get container info:", err)
 	}
