@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	json       bool
 	containers []string
 	showAll    bool
 	follow     bool
@@ -48,7 +47,6 @@ var logsCmd = &cobra.Command{
 }
 
 func init() {
-	logsCmd.Flags().BoolVarP(&json, "json", "j", false, "json output")
 	logsCmd.Flags().StringSliceVarP(&containers, "containers", "c", []string{}, "exampleContainer1,exampleContainer2,exampleContainer3")
 	logsCmd.Flags().BoolVarP(&showAll, "all", "a", false, "shows all logs")
 	logsCmd.Flags().BoolVarP(&follow, "follow", "f", false, "receive logs in real time")
