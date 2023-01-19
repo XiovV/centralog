@@ -24,6 +24,10 @@ func NewConfig() (*Config, error) {
 		return nil, errors.New("MONITOR_ALL_CONTAINERS or CONTAINERS environment variables should be specified")
 	}
 
+	if cfg.MonitorAllContainers && len(cfg.Containers) > 0 {
+		return nil, errors.New("MONITOR_ALL_CONTAINERS and CONTAINERS environment variables should not be set simultaneously")
+	}
+
 	return &cfg, err
 }
 
