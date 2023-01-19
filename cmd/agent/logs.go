@@ -113,7 +113,7 @@ func (s *Server) followLogs(wg *sync.WaitGroup, options types.ContainerLogsOptio
 	wg.Add(1)
 
 	containers := request.GetContainers()
-	if len(containers) < 0 {
+	if len(containers) == 0 {
 		config, err := s.Repository.GetConfig()
 		if err != nil {
 			s.Logger.Error("couldn't read config", zap.Error(err))
