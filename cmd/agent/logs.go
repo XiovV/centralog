@@ -6,6 +6,7 @@ import (
 	pb "github.com/XiovV/centralog-agent/grpc"
 	"github.com/XiovV/centralog-agent/repository"
 	"github.com/docker/docker/api/types"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -81,10 +82,6 @@ func (s *Server) sendLogs(logs []repository.Log, stream pb.Centralog_GetLogsServ
 }
 
 func (s *Server) validateGetLogsRequest(request *pb.GetLogsRequest) error {
-	if len(request.Containers) == 0 {
-		return errors.New("containers array empty")
-	}
-
 	if request.GetFirst() > 0 && request.GetLast() > 0 {
 		return errors.New("only first or last can be used, not both")
 	}
@@ -114,7 +111,21 @@ func (s *Server) followLogs(wg *sync.WaitGroup, options types.ContainerLogsOptio
 	stopSignals := []chan struct{}{}
 
 	wg.Add(1)
-	for _, container := range request.GetContainers() {
+
+	containers := []string{}
+	if len(request.GetContainers()) > 0 {
+		containers = request.GetContainers()
+	} else {
+		config, err := s.Repository.GetConfig()
+		if err != nil {
+			s.Logger.Error("couldn't read config", zap.Error(err))
+			return
+		}
+
+		containers = config.GetContainers()
+	}
+
+	for _, container := range containers {
 		stopSignal := make(chan struct{})
 		stopSignals = append(stopSignals, stopSignal)
 
