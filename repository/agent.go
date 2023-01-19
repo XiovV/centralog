@@ -1,13 +1,20 @@
 package repository
 
-import "strings"
+import (
+	"strings"
+)
 
 type LocalConfig struct {
+	ID         int
 	APIKey     string `db:"api_key"`
 	Containers string
 }
 
 func (l *LocalConfig) GetContainers() []string {
+	if len(l.Containers) == 0 {
+		return []string{}
+	}
+
 	return strings.Split(l.Containers, ",")
 }
 
@@ -29,4 +36,8 @@ func (r *SQLite) GetAPIKey() []byte {
 	r.db.Get(&key, "SELECT api_key FROM local LIMIT 1;")
 
 	return key
+}
+
+func (r *SQLite) StoreContainers(containers string) {
+	r.db.Exec("UPDATE local SET containers = $1 WHERE id = 1", containers)
 }
