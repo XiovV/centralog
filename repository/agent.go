@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"log"
 	"strings"
 )
 
@@ -28,7 +29,10 @@ func (r *SQLite) GetConfig() (LocalConfig, error) {
 }
 
 func (r *SQLite) StoreAPIKey(key []byte) {
-	r.db.Exec("INSERT INTO local (api_key) VALUES ($1)", key)
+	_, err := r.db.Exec("INSERT INTO local (id, api_key) VALUES ($1, $2)", 1, key)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (r *SQLite) GetAPIKey() []byte {
