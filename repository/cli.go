@@ -18,7 +18,7 @@ func (r *SQLite) InsertNode(node Node) error {
 func (r *SQLite) GetNodes() ([]Node, error) {
 	var nodes []Node
 
-	if err := r.db.Select(&nodes, "SELECT location, api_key, name, containers FROM nodes"); err != nil {
+	if err := r.db.Select(&nodes, "SELECT location, api_key, name FROM nodes"); err != nil {
 		return nodes, err
 	}
 
