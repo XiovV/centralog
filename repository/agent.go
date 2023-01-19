@@ -42,6 +42,6 @@ func (r *SQLite) GetAPIKey() []byte {
 	return key
 }
 
-func (r *SQLite) StoreContainers(containers string) {
-	r.db.Exec("UPDATE local SET containers = $1 WHERE id = 1", containers)
+func (r *SQLite) StoreContainers(containers []string) {
+	r.db.Exec("UPDATE local SET containers = $1 WHERE id = 1", strings.Join(containers, ","))
 }
