@@ -1,6 +1,6 @@
 # Overview
 `centralog` is a CLI tool used for reading logs from docker containers. It can read logs in real time from multiple containers, 
-as well as filter logs by certain criteria.
+as well as filter them by certain criteria.
 
 It's ideal for use cases where you want to read logs from multiple containers at once. Centralog will aggregate the logs 
 and display them, making it seem like you are reading logs from only one container.
