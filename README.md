@@ -39,7 +39,7 @@ Now you should see a new binary called `cli`.
 
 ### Adding a new node:
 To add a new node, run the `./cli add node` command, and an input prompt will show up:
-```shell
+```
 ? Enter your node's URL: localhost:8080
 ? Enter your node's API key: PD7Xk8WzmSpWl6MgeWl0lkMI6YBBqY8KWUN2457kr
 ? Enter your node's custom name: myNewNode
