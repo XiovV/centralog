@@ -6,7 +6,7 @@ It's ideal for use cases where you want to read logs from multiple containers at
 and display them, making it seem like you are reading logs from only one container.
 
 # Setup
-Centralog consist of two parts, the `agent`, which runs on your server, and the CLI tool, which runs on your personal machine.
+Centralog consist of two parts: the `agent`, which runs on your server, and the CLI tool, which runs on your personal machine.
 
 ## Agent setup
 Running the `agent` is as simple as running a single docker command:
