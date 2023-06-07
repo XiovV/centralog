@@ -20,7 +20,14 @@ sudo docker run -v ~/centralog/data:/data -p 8080:8080 \
 The `CONTAINERS` environment variable tells the `agent` which containers it should monitor. If you want it to monitor all of your containers, then set the `MONITOR_ALL_CONTAINERS` to true.
 
 Output:
-![](images/agent_initial_run.png)
+```
+Your new API key is: PD7Xk8WzmSpWl6MgeWl0lkMI6YBBqY8KWUN2457kr
+2023-06-07T14:26:16.762+0200    INFO    agent/main.go:52        storing containers      {"containers": ["logserver1", "logserver2"]}
+2023-06-07T14:26:16.764+0200    INFO    agent/main.go:72        initialising log listener...
+2023-06-07T14:26:16.764+0200    INFO    agent/server.go:72      getting container       {"containerName": "logserver1"}
+2023-06-07T14:26:16.768+0200    INFO    agent/server.go:72      getting container       {"containerName": "logserver2"}
+2023-06-07T14:26:16.770+0200    INFO    agent/main.go:79        server is listening for requests...     {"port": "8080"}
+```
 
 Take note of that API key written at the very top of the output, we will need it for setting up the CLI. And that's it, the agent is ready.
 
@@ -51,22 +58,37 @@ If any of the inputs is invalid (such as if the provided URL is unreachable, or 
 ### Monitoring logs
 In order to monitor logs in real time, run this command:
 ```shell
-./cli logs myNewNode
+$ ./cli logs myNewNode
 ```
-![](images/logs_realtime.png)
+```
+container: logserver1 | timestamp: 07/06/2023, 14:42:59 | message: 2023-06-07T12:42:59+0000 DEBUG This is a debug log that shows a log that can be ignored.
+container: logserver2 | timestamp: 07/06/2023, 14:42:59 | message: 2023-06-07T12:42:59+0000 WARN A warning that should be ignored is usually at this level and should be actionable.
+container: logserver2 | timestamp: 07/06/2023, 14:43:02 | message: 2023-06-07T12:43:02+0000 INFO This is less important than debug log and is often used to provide context in the current task.
+container: logserver1 | timestamp: 07/06/2023, 14:43:03 | message: 2023-06-07T12:43:03+0000 ERROR An error is usually an exception that has been caught and not handled.
+container: logserver2 | timestamp: 07/06/2023, 14:43:03 | message: 2023-06-07T12:43:03+0000 WARN A warning that should be ignored is usually at this level and should be actionable.
+container: logserver1 | timestamp: 07/06/2023, 14:43:04 | message: 2023-06-07T12:43:04+0000 DEBUG This is a debug log that shows a log that can be ignored.
+container: logserver1 | timestamp: 07/06/2023, 14:43:05 | message: 2023-06-07T12:43:05+0000 INFO This is less important than debug log and is often used to provide context in the current task.
+````
 You should see the logs being displayed as they are coming in real time. As you can see, both `logserver1` and `logserver2`'s logs are being displayed.
 
 ### Listing nodes
 If you'd like to list your nodes and check their statuses, run this command:
 ```shell
-./cli list nodes
+$ ./cli list nodes
 ```
-![](images/node_list.png)
+```
+NAME          CONTAINERS     STATUS     
+myNewNode     2/2            UP
+```
 
 ### Listing containers
 If you'd like to list the containers of a specific node, run this command:
 ```shell
-./cli list containers myNewNode
+$ ./cli list containers myNewNode
 ```
-![](images/containers_list.png)
+```
+NAME           STATUS
+logserver1     running
+logserver2     running
+```
 
